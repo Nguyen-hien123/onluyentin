@@ -1,5 +1,5 @@
-// Ôn luyện Tin — lưu app trên máy để mở được khi mất mạng. Bản: 20261026-2353
-const BAN = "olt-20261026-2353", TEP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
+// Ôn luyện Tin — lưu app trên máy để mở được khi mất mạng. Bản: 20261027-2054
+const BAN = "olt-20261027-2054", TEP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(BAN).then(c => c.addAll(TEP))); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== BAN).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
