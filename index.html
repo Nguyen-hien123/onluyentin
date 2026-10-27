@@ -180,7 +180,9 @@ table{width:100%;border-collapse:collapse;font-size:14px}
 th,td{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
 th{color:var(--muted);font-weight:600}
 .pill{display:inline-block;border-radius:8px;padding:2px 8px;font-weight:700;font-family:ui-monospace,Consolas,monospace;background:var(--brand-soft);color:var(--brand)}
-.toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:20;max-width:90%;text-align:center;animation:pop .25s}
+.guipill{position:fixed;left:50%;bottom:calc(68px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:19;border:0;border-radius:999px;padding:7px 14px;font:600 13px/1.3 inherit;font-family:inherit;max-width:92%;box-shadow:var(--shadow);background:var(--card);color:var(--ink);cursor:pointer;transition:opacity .4s}
+.guipill[data-tt=toi]{background:#dcfce7;color:#14532d}.guipill[data-tt=loi]{background:#fee2e2;color:#7f1d1d}.guipill.an{opacity:0;pointer-events:none}
+.toast{position:fixed;left:50%;bottom:112px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:20;max-width:90%;text-align:center;animation:pop .25s}
 @keyframes pop{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .sec-t{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:18px 4px 8px}
 .chip{display:inline-flex;align-items:center;gap:4px;border:2px solid var(--line);background:var(--card);border-radius:999px;padding:6px 12px;margin:4px 4px 0 0;font-weight:600;font-size:14px}
@@ -218,6 +220,28 @@ let MEM={users:{},last:null};
 function loadStore(){try{const s=localStorage.getItem(KEY);if(s)MEM=JSON.parse(s)}catch(e){}if(!MEM.users)MEM.users={}}
 function ghiMay(){try{localStorage.setItem(KEY,JSON.stringify(MEM))}catch(e){}}
 function save(){trackMonth();ghiMay();henGui()}
+// mở trong khung nhúng (Google Sites…) hay trình duyệt chặn lưu → nhắc mở app toàn màn hình
+const TRONG_KHUNG=(()=>{try{return window.top!==window.self}catch(e){return true}})();
+const MAY_LUU=(()=>{try{localStorage.setItem(KEY+"_thu","1");localStorage.removeItem(KEY+"_thu");return true}catch(e){return false}})();
+const linkDayDu=()=>TRANG_APP||(/^https?:/.test(location.href)?location.href.split("#")[0]:"");
+function khungBao(){
+  if(!TRONG_KHUNG&&MAY_LUU)return "";
+  const l=linkDayDu();
+  return `<div class="card" style="border:2px solid ${MAY_LUU?"var(--brand-2)":"#dc2626"}"><b>${MAY_LUU?"🌐 Em đang mở app bên trong trang web của cô":"⚠️ Trình duyệt đang chặn lưu kết quả trên máy"}</b>
+   <div class="small" style="margin-top:4px">${MAY_LUU?"Kết quả vẫn gửi tới cô. Để <b>lưu chắc chắn trên máy</b>, <b>tải tệp lưu</b> và <b>lưu ảnh huy hiệu, giấy chứng nhận</b>, em mở app toàn màn hình.":"Đóng trang này là mất phần chưa gửi tới cô. Em mở app toàn màn hình (hoặc tắt chế độ ẩn danh) rồi đăng nhập lại — app tự lấy lại tiến độ từ sổ của cô."}</div>
+   ${l?`<a class="btn" style="display:block;text-align:center;text-decoration:none" href="${esc(l)}" target="_blank" rel="noopener">↗️ Mở app toàn màn hình</a>`:""}</div>`;
+}
+// tải tệp về máy: điện thoại mở bảng chia sẻ, không được thì tải thẳng
+function luuTep(b,ten,tieuDe){
+  const tai=()=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=ten;document.body.appendChild(a);a.click();a.remove();
+    toast(TRONG_KHUNG?"Không thấy tệp tải về? Em bấm Mở app toàn màn hình rồi lưu lại nhé":"Đã tải về máy ✓")};
+  const f=typeof File==="function"?new File([b],ten,{type:b.type}):null;
+  if(f&&navigator.canShare&&/Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)){
+    let duoc=false;try{duoc=navigator.canShare({files:[f]})}catch(e){}
+    if(duoc)return navigator.share({files:[f],title:tieuDe}).catch(e=>{if(!e||e.name!=="AbortError")tai()});
+  }
+  tai();
+}
 const COLORS=["var(--c1)","var(--c2)","var(--c3)","var(--c4)","var(--c5)","var(--c6)","var(--c7)"];
 
 /* mã HS, PIN, mã mở khoá */
@@ -268,7 +292,20 @@ function trackMonth(){
   U.lastPts=tp;U.lastN2=n2;
 }
 let SYNC_T=null;
-function henGui(){if(!U||U.xem||!coSheet())return;U.canGui=1;clearTimeout(SYNC_T);SYNC_T=setTimeout(guiNgay,2500)}
+function henGui(){if(!U||U.xem||!coSheet())return;U.canGui=1;baoGui("cho");clearTimeout(SYNC_T);SYNC_T=setTimeout(guiNgay,1200)}
+// thanh trạng thái gửi kết quả tới sổ của cô (nổi trên mọi màn hình)
+let GUI_TT="";
+function baoGui(tt,t){
+  let p=$("#guipill");
+  if(!U||U.xem||!coSheet()){if(p)p.remove();return}
+  if(!p){p=document.createElement("button");p.id="guipill";p.className="guipill";document.body.appendChild(p);
+    p.onclick=()=>{if(GUI_TT==="toi"){p.classList.add("an");return}if(GUI_TT!=="dang"){U.canGui=1;guiNgay()}}}
+  GUI_TT=tt;p.dataset.tt=tt;p.classList.remove("an");clearTimeout(p._t);
+  p.textContent={cho:"⏳ Kết quả mới đang chờ gửi tới cô…",dang:"📤 Đang gửi kết quả tới cô…",
+    toi:"✅ Cô đã nhận kết quả của em"+(t?" · "+new Date(t).toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"}):""),
+    loi:navigator.onLine===false?"📴 Mất mạng — có mạng app tự gửi tới cô":"⚠️ Chưa gửi được tới cô — bấm để gửi lại"}[tt];
+  if(tt==="toi")p._t=setTimeout(()=>p.classList.add("an"),7000);
+}
 function goiGui(){
   const g=U.g,all=DATA[g].bai.filter(b=>!b.cho),th=ym(),m=thangU(th);
   const u=JSON.stringify({code:U.code,g,lp:U.lp,boss:U.boss,de:U.de,mo:U.mo,sai:U.sai.slice(-60),t0:U.t0,thang:U.thang,lastPts:U.lastPts,lastN2:U.lastN2,xp:U.xp,dbk:U.dbk,tdBest:U.tdBest,tdLuot:U.tdLuot,sanN:U.sanN,nhanN:U.nhanN});
@@ -279,11 +316,27 @@ function goiGui(){
 }
 function guiNgay(){
   guiTDCho();
-  if(!U||U.xem||!coSheet()||!U.canGui||navigator.onLine===false)return Promise.resolve(false);
-  const nguoi=U;
-  return fetch(SHEET,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(goiGui())})
-    .then(()=>{nguoi.canGui=0;nguoi.daGui=Date.now();ghiMay();return true},()=>false);
+  if(!U||U.xem||!coSheet()||!U.canGui)return Promise.resolve(false);
+  if(navigator.onLine===false){baoGui("loi");return Promise.resolve(false)}
+  const nguoi=U,goi=goiGui();baoGui("dang");
+  return fetch(SHEET,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(goi)})
+    .then(()=>{nguoi.canGui=0;nguoi.daGui=Date.now();ghiMay();xacNhan(nguoi,goi.tong);return true},()=>{if(U===nguoi)baoGui("loi");return false});
 }
+// đọc lại sổ của cô: điểm trên sổ đã bằng điểm vừa gửi thì báo "cô đã nhận"
+function xacNhan(nguoi,tong){
+  setTimeout(()=>{if(U!==nguoi)return;
+    taiSo().then(d=>{if(U!==nguoi)return;
+      if(d.td&&+d.td.tong>=tong){nguoi.toiCo=Date.now();ghiMay();baoGui("toi",nguoi.toiCo);if(!VIEW&&(TAB==="toi"||TAB==="diem"))render()}
+      else{nguoi.canGui=1;ghiMay();baoGui("loi")}
+    }).catch(()=>{if(U===nguoi){nguoi.canGui=1;ghiMay();baoGui("loi")}})},1500);
+}
+// đóng trang / chuyển app khi còn kết quả chưa gửi: gửi kèm theo (sendBeacon)
+function guiKhiDong(){
+  if(!U||U.xem||!coSheet()||!U.canGui||!navigator.sendBeacon)return;
+  try{navigator.sendBeacon(SHEET,new Blob([JSON.stringify(goiGui())],{type:"text/plain;charset=utf-8"}))}catch(e){}
+}
+window.addEventListener("pagehide",guiKhiDong);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)guiKhiDong()});
 window.addEventListener("online",()=>guiNgay());
 function taiSo(){
   if(!coSheet())return Promise.reject(new Error("chưa nối sổ"));
@@ -358,7 +411,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-back]");if
 function viewLogin(){
   const recent=Object.keys(MEM.users).slice(-4).reverse();
   return `<div class="hero"><div class="logo">Tin</div><h2>Ôn luyện Tin học</h2><div class="muted">${TRUONG} · Tin 10 · 11 · 12</div></div>
-  <div class="wrap"><div class="card">
+  <div class="wrap">${khungBao()}<div class="card">
    <label for="lop">Lớp của em</label><input id="lop" type="text" placeholder="VD: 10A1" autocomplete="off" autocapitalize="characters">
    <label for="stt">Số thứ tự trong danh sách lớp</label><input id="stt" type="tel" inputmode="numeric" placeholder="VD: 5" maxlength="2">
    <label for="pin">Mã PIN cô phát (4 số)</label><input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
@@ -397,7 +450,7 @@ function viewMain(){
   if(TAB==="thanh")body=viewThanh();
   if(TAB==="toi")body=viewToi();
   const tb=[["map","🗺️","Lộ trình"],["de","📝","Luyện đề"],["diem","📊","Điểm"],["thanh","🏅","Thành tích"],["toi","👤","Tài khoản"]];
-  return topbar(titles[TAB]+(U.xem?" · xem thử":""))+`<div class="wrap">${body}</div>
+  return topbar(titles[TAB]+(U.xem?" · xem thử":""))+`<div class="wrap">${TAB==="map"||TAB==="toi"?khungBao():""}${body}</div>
   <nav class="tabbar"><div class="in">${tb.map(t=>`<button data-tab="${t[0]}" class="${TAB===t[0]?"on":""}"><span>${t[1]}</span>${t[2]}</button>`).join("")}</div></nav>`;
 }
 function levelCard(){
@@ -674,11 +727,48 @@ function viewThanh(){
   const bossN=Object.values(U.boss).filter(b=>b.pass).length;
   return levelCard()+`<div class="grid2"><div class="tile"><div class="v">${done}/${all.length}</div><div class="l">bài hoàn thành</div></div><div class="tile"><div class="v">${stars}</div><div class="l">ngôi sao</div></div>
   <div class="tile"><div class="v">${bossN}</div><div class="l">thử thách đã vượt</div></div><div class="tile"><div class="v">${U.sai.length}</div><div class="l">câu trong sổ câu sai</div></div></div>
+  <button class="btn gold" id="anhtt">🏅 Lưu ảnh thành tích & huy hiệu về máy</button>
   <div class="sec-t">Huy hiệu</div><div class="bdg">${badges().map(b=>`<div class="b ${b[3]?"":"off"}" title="${esc(b[2])}"><span class="i">${b[0]}</span><b>${esc(b[1])}</b><br><span class="muted">${esc(b[2])}</span></div>`).join("")}</div>
   <div class="sec-t">Các cấp độ</div><div class="card small">${LEVELS.map(l=>`${l[1]} <b>${l[2]}</b> — từ ${l[0]} điểm`).join("<br>")}</div>
   <div class="card small muted"><b>Cách tính điểm thưởng:</b> đọc trọng tâm +10 · ôn sơ đồ +10 · lật hết thẻ +10 · luyện tập: điểm tốt nhất × 10 (+20 khi đạt ★★★) · thử thách chặng: điểm × 20 (+50 khi vượt) · luyện đề: điểm tốt nhất × 10. Làm lại chỉ được thêm điểm khi vượt kết quả cũ.</div>`;
 }
-function bindThanh(){}
+function bindThanh(){const b=$("#anhtt");if(b)b.onclick=luuAnhThanh}
+/* ══════════ TỆP LƯU · ẢNH THÀNH TÍCH ══════════ */
+function tepLuu(){
+  const u=Object.assign({},U);delete u.so;const s=JSON.stringify(u);
+  return JSON.stringify({app:"onluyen-tin",v:1,ma:U.code,luc:new Date().toLocaleString("vi-VN"),diem:totalPts(),u:s,ck:(h32(BIMAT+"|luu|"+s)%1679616).toString(36)});
+}
+function moTepLuu(txt){
+  const bao=(t,ok)=>{const m=$("#tepmsg");if(m)m.innerHTML=`<div class="${ok?"okmsg":"err"}">${t}</div>`};
+  let o,u;try{o=JSON.parse(txt);u=JSON.parse(o.u)}catch(e){return bao("Tệp này không phải tệp lưu của app.")}
+  if(o.app!=="onluyen-tin"||(h32(BIMAT+"|luu|"+o.u)%1679616).toString(36)!==o.ck)return bao("Tệp lưu bị sửa hoặc hỏng, app không nhận.");
+  if(o.ma!==U.code||!u||u.code!==U.code)return bao(`Đây là tệp của mã ${esc(o.ma)}. Em đăng nhập đúng mã đó rồi mở lại tệp.`);
+  const nu=Object.assign(newUser(U.code,U.g),u,{so:U.so}),cu=totalPts(),moi=totalPts(nu);
+  if(!confirm(moi<cu?`Tệp lưu (${o.luc}) có ${moi} ⭐, ÍT HƠN trên máy này (${cu} ⭐). Vẫn thay bằng tệp?`:`Lấy kết quả từ tệp lưu (${o.luc}): ${moi} ⭐?`))return;
+  MEM.users[U.code]=U=nu;save();render();toast("Đã mở tệp lưu ✓");
+}
+function luuAnhThanh(){
+  const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;const c=cv.getContext("2d");
+  const F=typeof CN_SANS==="string"?CN_SANS:"system-ui, sans-serif";
+  const g=c.createLinearGradient(0,0,W,H);g.addColorStop(0,"#0f766e");g.addColorStop(1,"#1e3a8a");c.fillStyle=g;c.fillRect(0,0,W,H);
+  c.fillStyle="#ffffff";c.beginPath();c.roundRect?c.roundRect(50,50,W-100,H-100,40):c.rect(50,50,W-100,H-100);c.fill();
+  const chu=(t,x,y,px,w,mau,canh)=>{c.font=`${w||"normal"} ${px}px ${F}`;c.fillStyle=mau||"#0f172a";c.textAlign=canh||"center";c.fillText(t,x,y,W-180)};
+  const p=totalPts(),L=levelOf(p),all=DATA[U.g].bai.filter(b=>!b.cho),st=all.map(b=>(U.lp[b.so]||{}).st||0);
+  chu("THÀNH TÍCH ÔN LUYỆN TIN HỌC "+U.g,W/2,150,44,"bold","#0f766e");
+  chu(TRUONG,W/2,200,28,"normal","#475569");
+  chu(L.ic,W/2,330,110);chu(L.ten,W/2,410,50,"bold");
+  chu(U.code+" · "+p+" ⭐ điểm thưởng",W/2,470,36,"bold","#1e3a8a");
+  const so=[[st.filter(x=>x>=2).length+"/"+all.length,"bài ★★"],[st.reduce((a,b)=>a+b,0),"ngôi sao"],[Object.values(U.boss).filter(b=>b.pass).length,"chặng đã vượt"],[Object.keys(U.dbk||{}).length,"gói đặc biệt"]];
+  so.forEach((o,i)=>{const x=90+i*225;c.fillStyle="#f0fdfa";c.fillRect(x,510,200,130);chu(String(o[0]),x+100,580,46,"bold","#0f766e");chu(o[1],x+100,620,24,"normal","#475569")});
+  const co=badges().filter(b=>b[3]);
+  chu("HUY HIỆU ĐÃ NHẬN ("+co.length+")",W/2,710,34,"bold");
+  if(!co.length)chu("Chưa có huy hiệu — cố lên em nhé!",W/2,790,30,"italic","#64748b");
+  co.slice(0,20).forEach((b,i)=>{const x=150+(i%5)*195,y=790+Math.floor(i/5)*125;chu(b[0],x,y,56);c.font=`bold 21px ${F}`;c.fillStyle="#0f172a";c.textAlign="center";c.fillText(b[1],x,y+40,180)});
+  if(co.length>20)chu("… và "+(co.length-20)+" huy hiệu khác",W/2,1290-60,24,"italic","#64748b");
+  const d=new Date(),body=[U.code,p,co.length,d.toISOString().slice(0,10)].join("|");
+  chu(`Lưu ngày ${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()} · ${GV} · Mã xác thực ${(h32(BIMAT+"|tt|"+body)%1679616).toString(36).toUpperCase()}`,W/2,1265,22,"italic","#94a3b8");
+  cv.toBlob(b=>luuTep(b,`Thanh tich ${U.code} ${ym()}.png`,"Thành tích ôn luyện Tin"),"image/png");
+}
 
 /* ══════════ ĐIỂM CỦA EM (sổ điểm Google Sheet) ══════════ */
 const so=v=>String(v==null?"":v).replace(".",",");
@@ -793,10 +883,20 @@ function viewToi(){
   ${theCai(true)}
   <div class="card"><h3 style="margin:0 0 6px">🎨 Giao diện</h3><div class="row"><button class="btn ghost" data-th="light">☀️ Sáng</button><button class="btn ghost" data-th="dark">🌙 Tối</button><button class="btn ghost" data-th="">⚙️ Theo máy</button></div></div>
   <button class="btn ghost" id="logout">Đăng xuất</button>
-  ${coSheet()?`<div class="card small muted">☁️ Sổ điểm của ${GV}: ${U.canGui?"còn tiến độ chờ gửi (tự gửi khi có mạng)":U.daGui?"đã gửi lúc "+new Date(U.daGui).toLocaleString("vi-VN"):"chưa gửi lần nào"}</div>`:""}
+  ${coSheet()?`<div class="card"><h3 style="margin:0 0 6px">☁️ Kết quả gửi tới ${GV}</h3><div class="small">${U.canGui?"⏳ Còn kết quả chờ gửi (có mạng app tự gửi).":U.toiCo&&U.toiCo>=(U.daGui||0)?"✅ Cô đã nhận kết quả của em lúc "+new Date(U.toiCo).toLocaleString("vi-VN")+".":U.daGui?"📤 Đã gửi lúc "+new Date(U.daGui).toLocaleString("vi-VN")+", đang chờ sổ xác nhận.":"Chưa gửi lần nào."}</div>
+   <button class="btn ghost" id="guilai">📤 Gửi lại ngay</button></div>`:""}
+  <div class="card"><h3 style="margin:0 0 6px">💾 Lưu kết quả về máy</h3><div class="small muted">Tệp lưu chứa toàn bộ tiến độ, ⭐ điểm thưởng, huy hiệu và sổ câu sai của ${esc(U.code)}. Đổi máy hoặc lỡ xoá dữ liệu trình duyệt thì đăng nhập rồi mở lại tệp này.</div>
+   <div class="row"><button class="btn" id="luutep">⬇️ Tải tệp lưu</button><button class="btn ghost" id="motep">📂 Mở tệp lưu</button></div>
+   <input type="file" id="teplu" accept=".json,application/json,text/plain" style="display:none"><div id="tepmsg"></div>
+   <button class="btn ghost" id="anhtt">🏅 Lưu ảnh thành tích & huy hiệu</button></div>
   <div class="small muted" style="margin-top:14px;text-align:center">App ôn luyện Tin học · ${TRUONG}<br>Nội dung bám SGK Tin học 10, 11 (Kết nối tri thức) · ${GV}</div>`;
 }
 function bindToi(){
+  const gl=$("#guilai");if(gl)gl.onclick=()=>{U.canGui=1;guiNgay().then(ok=>{if(!ok)toast(navigator.onLine===false?"Máy đang mất mạng":"Chưa gửi được, em thử lại sau nhé")})};
+  $("#luutep").onclick=()=>luuTep(new Blob([tepLuu()],{type:"application/json"}),`Ket qua On luyen Tin ${U.code} ${ym()}.json`,"Tệp lưu kết quả");
+  $("#motep").onclick=()=>$("#teplu").click();
+  $("#teplu").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>moTepLuu(String(r.result));r.readAsText(f);e.target.value=""};
+  $("#anhtt").onclick=luuAnhThanh;
   $("#copybc").onclick=()=>{const t=$("#bc").textContent;(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>toast("Đã sao chép ✓"),()=>{const r=document.createRange();r.selectNodeContents($("#bc"));const s=getSelection();s.removeAllRanges();s.addRange(r);toast("Em giữ ngón tay để sao chép nhé")})};
   $("#nhapmo").onclick=()=>{
     const v=$("#mamo").value.trim().toUpperCase();const g=U.g;let ok=null;
@@ -1265,11 +1365,7 @@ function veGiayCN(o, ten){
 }
 // lưu ảnh: điện thoại mở bảng chia sẻ (Lưu hình ảnh / Zalo…); máy tính tải tệp PNG
 function luuAnhCN(cv, ten){
-  cv.toBlob(b => {
-    const f = typeof File === "function" ? new File([b], ten, { type: "image/png" }) : null;
-    if (f && navigator.canShare && navigator.canShare({ files: [f] }) && /Android|iPhone|iPad|Mobile/i.test(navigator.userAgent)) navigator.share({ files: [f], title: "Giấy chứng nhận" }).catch(() => {});
-    else { const a = document.createElement("a"); a.href = URL.createObjectURL(b); a.download = ten; document.body.appendChild(a); a.click(); a.remove(); toast("Đã tải ảnh giấy chứng nhận về máy ✓"); }
-  }, "image/png");
+  cv.toBlob(b => luuTep(b, ten, "Giấy chứng nhận"), "image/png");
 }
 
 
@@ -1278,7 +1374,7 @@ loadStore();
 try{const t=localStorage.getItem(KEY+"_theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 if(MEM.last&&MEM.users[MEM.last])U=MEM.users[MEM.last];
 render();
-if(U&&U.canGui)setTimeout(guiNgay,1500);
+if(U&&U.canGui){baoGui("cho");setTimeout(guiNgay,1500)}
 // lấy sổ điểm nền (để hiện phiếu khảo sát, vinh danh mới) — tối đa 1 lần/giờ; quay lại app sau khi làm phiếu thì kiểm lại
 function soNen(ep){if(!U||U.xem||!coSheet()||navigator.onLine===false)return;if(!ep&&U.so&&Date.now()-U.so.t<3600e3)return;taiSo().then(()=>{if(!VIEW)render()}).catch(()=>{})}
 setTimeout(()=>soNen(),2500);
