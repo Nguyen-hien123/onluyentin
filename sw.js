@@ -1,7 +1,7 @@
-// Ôn luyện Tin — lưu app trên máy để mở được khi mất mạng. Bản: 20261027-2251
-const BAN = "olt-20261027-2251", TEP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
+// Chinh phục Tin 11 — lưu app trên máy để mở được khi mất mạng. Bản: 20261101-2141
+const BAN = "olt-20261101-2141", TEP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(BAN).then(c => c.addAll(TEP))); self.skipWaiting(); });
-self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== BAN).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("olt-") && k !== BAN).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
   const r = e.request, u = new URL(r.url);
   if (r.method !== "GET" || u.origin !== location.origin) return;           // sổ điểm Google Sheet, Google Form đi thẳng, không qua đây
