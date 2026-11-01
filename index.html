@@ -201,6 +201,64 @@ th{color:var(--muted);font-weight:600}
 .slips{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
 .slip{border:1.5px dashed var(--muted);border-radius:10px;padding:8px;font-size:13px;text-align:center}
 .slip b{font-size:16px}
+
+/* ══════════ GIAO DIỆN RỘNG, CHỮ TO, KHÔNG THANH TRƯỢT NGANG ══════════ */
+html,body{overflow-x:hidden}
+#app{max-width:1180px}
+.tabbar .in{max-width:1180px}
+.ltabs{flex-wrap:wrap;overflow:visible;position:static;padding:14px 16px 2px}
+.ltabs button{font-size:15px;padding:9px 14px}
+.gvtabs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.gvtabs button{border-radius:14px;padding:12px 8px;font-size:15px;text-align:center;line-height:1.25}
+.grid2{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:14px}
+.card{overflow-wrap:anywhere}
+table{table-layout:auto}
+th,td{overflow-wrap:anywhere}
+select,input,textarea{max-width:100%}
+@media (min-width:760px){
+  body{font-size:18px}
+  .top{padding:16px 24px}
+  .top h1{font-size:24px}
+  .top .back{width:46px;height:46px}
+  .pts{font-size:17px}
+  .wrap{padding:22px 24px}
+  .ltabs{padding:18px 24px 4px;gap:10px}
+  .ltabs button{font-size:17px;padding:11px 18px}
+  .gvtabs{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+  .gvtabs button{font-size:17px;padding:15px 10px}
+  .card{padding:22px;margin-bottom:18px}
+  .small{font-size:16px}
+  .btn{font-size:19px;padding:16px 18px}
+  label{font-size:17px}
+  select,input,textarea{font-size:18px}
+  table{font-size:16px}
+  th,td{padding:9px 10px}
+  .qtext{font-size:22px}
+  .opt{font-size:18px;padding:14px 16px}
+  .chang h3{font-size:20px}
+  .tile .v{font-size:32px}
+  .tile .l{font-size:16px}
+  .tile{padding:18px}
+  .bdg{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .bdg .b{font-size:15px}
+  .tabbar button{font-size:15px}
+  .tabbar button span{font-size:26px}
+  .hero h2{font-size:32px}
+  /* lộ trình: các chặng xếp 2 cột */
+  .wrap:has(>.chang){display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+  .wrap:has(>.chang)>*{margin-bottom:0;min-width:0}
+  .wrap:has(>.chang)>*:not(.chang){grid-column:1/-1}
+  .slips{grid-template-columns:repeat(4,1fr)}
+}
+/* điện thoại: bảng 10 cột vừa màn hình, bỏ cột giờ gửi */
+@media (max-width:759px){
+  .gvtabs{grid-template-columns:repeat(3,1fr);gap:6px;padding:12px 12px 2px}
+  .gvtabs button{font-size:13px;padding:10px 4px}
+  .wrap{padding:12px}
+  table{font-size:12.5px}
+  th,td{padding:5px 3px}
+  .bang-td th:last-child,.bang-td td:last-child{display:none}
+}
 </style>
 </head>
 <body>
@@ -950,7 +1008,7 @@ function viewGV(){
   if(!GVOK){VIEW="gv";return viewGVLogin()}
   const tabs=GVQL?[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"]]:[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"],["mg","🧩 Mảnh ghép, bể cá"],["gviec","📣 Giao việc"],["dh","⏰ Đồng hồ"],["tru","⚠️ Trừ điểm"],["pin","🔑 Phát PIN"],["mo","🔓 Mã mở khoá"],["so","☁️ Sổ điểm"],["bc","📊 Mã báo cáo"],["xem","👀 Xem thử"]];
   let b="";
-  if(GVTAB==="pin")b=`<div class="card noprint"><div class="row"><div><label for="glop">Lớp</label><input id="glop" type="text" placeholder="11A3" value="${esc(GV_LOP||"")}"></div><div><label for="gsi">Sĩ số</label><input id="gsi" type="tel" inputmode="numeric" value="${GV_SI||40}"></div></div><button class="btn" id="gpin">Tạo phiếu PIN</button></div><div id="pinout">${GV_LOP?pinSlips():""}</div>`;
+  if(GVTAB==="pin")b=`<div class="card noprint"><div class="row"><div><label for="glop">Lớp</label><input id="glop" type="text" placeholder="11A3" value="${esc(GV_LOP||"")}"></div><div><label for="gsi">Sĩ số</label><input id="gsi" type="tel" inputmode="numeric" value="${GV_SI||40}"></div></div><button class="btn" id="gpin">Tạo phiếu PIN</button><button class="btn gold" id="gpinx">⬇️ Tải Excel: mã, mật khẩu, quân bài (${Object.keys(LOP_CO).sort().join(", ")})</button><div class="small muted" style="margin-top:6px">🔒 Tệp có mật khẩu của học sinh: cô giữ riêng, không gửi lên nhóm lớp.</div></div><div id="pinout">${GV_LOP?pinSlips():""}</div>`;
   if(GVTAB==="mo")b=moTable();
   if(GVTAB==="td")b=viewTheoDoi();
   if(GVTAB==="ptl")b=viewPhanTich();
@@ -965,7 +1023,7 @@ function viewGV(){
   if(GVTAB==="xem")b=`<div class="card"><div class="small muted">Mở app như học sinh với <b>mọi bài đã mở khoá</b> để cô duyệt nội dung, câu hỏi. Tiến độ xem thử lưu riêng, không lẫn với học sinh.</div><button class="btn ghost" data-xem="11">Xem thử Tin 11</button></div>
    <div class="card small"><b>Thống kê ngân hàng câu hỏi Tin 11</b><br>${(bs=>`${bs.length} bài · ${bs.reduce((s,b)=>s+(b.td||[]).length,0)} câu Cổng, Thách đấu (50 câu mỗi bài) · ${bs.filter(b=>b.db).length} gói đặc biệt (12 câu mỗi gói, lấy từ ngân hàng trên) · ${bs.reduce((s,b)=>s+b.mcq.length,0)} câu Luyện tập · ${bs.reduce((s,b)=>s+b.tf.length,0)} câu Đúng/Sai · ${bs.reduce((s,b)=>s+b.the.length,0)} thẻ nhớ`)(DATA["11"].bai)}</div>`;
   return `<div class="top noprint"><button class="back" id="gvout">←</button><h1>Trang giáo viên</h1></div>
-  <div class="ltabs noprint" style="top:64px">${tabs.map(t=>`<button data-gt="${t[0]}" class="${GVTAB===t[0]?"on":""}">${t[1]}</button>`).join("")}</div><div class="wrap">${b}</div>`;
+  <div class="ltabs gvtabs noprint">${tabs.map(t=>`<button data-gt="${t[0]}" class="${GVTAB===t[0]?"on":""}">${t[1]}</button>`).join("")}</div><div class="wrap">${b}</div>`;
 }
 let GV_LOP="",GV_SI=40,GV_BC="",GV_SO="",GVPIN="";
 function pinSlips(){
@@ -1007,6 +1065,7 @@ function bindGV(){
   if(GVTAB==="dh")bindDongHoGV();
   if(GVTAB==="tru")bindTruDiem();
   document.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>{GVTAB=b.dataset.gt;render()});
+  const gx=$("#gpinx");if(gx)gx.onclick=taiExcelPIN;
   const gp=$("#gpin");if(gp)gp.onclick=()=>{GV_LOP=$("#glop").value;GV_SI=Math.min(60,Math.max(1,parseInt($("#gsi").value,10)||40));$("#pinout").innerHTML=pinSlips()};
   const bg=$("#bcgo");if(bg)bg.onclick=()=>{GV_BC=$("#bcin").value;const rows=readReports(GV_BC);$("#bcout").innerHTML=bcTable(rows);
     const c=$("#csv");if(c)c.onclick=()=>{const lines=[["Ma HS","Diem thuong","Bai dat 2 sao tro len","Tong sao","Chang da vuot","Diem de KT tot nhat","Ngay gui","Ma hop le"].join(",")].concat(rows.map(r=>{const st=r.st.split("").map(Number);return [r.code,r.pts,st.filter(x=>x>=2).length,st.reduce((a,b)=>a+b,0),r.bo.split("").filter(x=>x==="1").length,String(r.chuan).replace(".",","),r.day,r.ok?"co":"KHONG"].map(v=>`"${v}"`).join(",")}));
@@ -1248,7 +1307,7 @@ function viewTheoDoi(){
   h+=`<div class="grid2">${TD_NHOM.map(n=>{const a=rows.filter(([_,r])=>n[2](r));return `<button class="tile" data-loc="${n[0]}" style="border:2px solid ${TD_LOC===n[0]?"var(--brand)":"transparent"}"><div class="v">${a.length}<span class="small muted">/${si}</span></div><div class="l">${n[1]}</div></button>`}).join("")}</div>`;
   const loc=TD_LOC?TD_NHOM.find(n=>n[0]===TD_LOC):null;
   if(loc)h+=`<div class="card"><b>${loc[1]} · lớp ${esc(TD_LOP)}</b><div style="margin-top:6px">${rows.filter(([_,r])=>loc[2](r)).map(([i])=>`<span class="chip">${esc(TD_LOP)}-${String(i).padStart(2,"0")}</span>`).join("")||'<span class="small muted">Không có em nào.</span>'}</div></div>`;
-  h+=`<div class="card" style="overflow-x:auto"><table><tr><th>STT</th><th>Trạng thái</th><th>⭐</th><th>Bài ★★</th><th>🛂</th><th>🪞</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>Gửi lúc</th></tr>
+  h+=`<div class="card bang-td"><table><tr><th>STT</th><th>Trạng thái</th><th>⭐</th><th>Bài ★★</th><th>🛂</th><th>🪞</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>Gửi lúc</th></tr>
    ${rows.map(([i,r])=>`<tr><td><b>${i}</b> <span class="small muted">${quanBai(TD_LOP+"-"+i)}</span></td><td>${!r?"🚫 Chưa vào":(+r.bai2>0||+r.tong>0)?"✏️ Đang học":"👤 Mới vào"}</td><td>${r?r.tong:""}</td><td>${r?r.bai2:""}</td><td>${r?r.tem||0:""}</td><td>${r?r.ptN||0:""}</td><td>${r?r.dbX||0:""}</td><td>${r?r.san||0:""}</td><td>${r?r.nhan||0:""}</td><td class="small">${r?esc(String(r.luc).slice(0,16)):""}</td></tr>`).join("")}</table>
    <div class="small muted" style="margin-top:6px">🌸 số gói đặc biệt đã xong · ⚔️ số lời thách em đưa lên sàn · 🤝 số lần nhận lời thách của bạn. Bấm vào ô tổng hợp phía trên để xem danh sách mã. Chỉ có mã Lớp-STT.</div></div>`;
   return h;
@@ -1682,6 +1741,51 @@ function hienDongHo(){
 
 function viewDongHoGV(){return `<div class="card"><b>⏰ Đồng hồ trên lớp</b><div class="small muted" style="margin-top:4px">Đồng hồ nổi ở góc màn hình, vẫn chạy khi cô chuyển tab. Bấm ⛶ để phóng to khi chiếu. Hết giờ chuông reo 5 tiếng; có chuông gọi vào lớp và nhạc nền nhẹ do app tự tạo, không cần mạng.</div><button class="btn" id="dhmo">⏰ Mở đồng hồ</button></div>`}
 function bindDongHoGV(){const b=$("#dhmo");if(b)b.onclick=hienDongHo}
+
+/* ══════════ TẢI EXCEL DANH SÁCH MÃ, MẬT KHẨU, QUÂN BÀI (mỗi lớp một trang) ══════════ */
+const crcBang = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const crc32 = u => { let c = 0xFFFFFFFF; for (let i = 0; i < u.length; i++) c = crcBang[(c ^ u[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+function zipLuu(tep){   // tep: [{ten, du(Uint8Array)}], không nén
+  const enc = new TextEncoder(), phan = [], tt = []; let o = 0;
+  tep.forEach(f => {
+    const ten = enc.encode(f.ten), c = crc32(f.du), h = new DataView(new ArrayBuffer(30));
+    h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint32(14, c, true); h.setUint32(18, f.du.length, true); h.setUint32(22, f.du.length, true); h.setUint16(26, ten.length, true);
+    phan.push(new Uint8Array(h.buffer), ten, f.du);
+    const d = new DataView(new ArrayBuffer(46)); d.setUint32(0, 0x02014b50, true); d.setUint16(4, 20, true); d.setUint16(6, 20, true); d.setUint16(8, 0x0800, true); d.setUint32(16, c, true); d.setUint32(20, f.du.length, true); d.setUint32(24, f.du.length, true); d.setUint16(28, ten.length, true); d.setUint32(42, o, true);
+    tt.push(new Uint8Array(d.buffer), ten); o += 30 + ten.length + f.du.length;
+  });
+  const cd = tt.reduce((a, x) => a + x.length, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, tep.length, true); e.setUint16(10, tep.length, true); e.setUint32(12, cd, true); e.setUint32(16, o, true);
+  return new Blob([...phan, ...tt, new Uint8Array(e.buffer)], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+}
+function taoXlsx(trangs){
+  const enc = new TextEncoder(), X = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, "");
+  const cot = i => { let s = ""; i++; while (i) { const m = (i - 1) % 26; s = String.fromCharCode(65 + m) + s; i = Math.floor((i - 1) / 26); } return s; };
+  const NS = 'xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"', R = 'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"';
+  const tep = [];
+  tep.push({ ten: "[Content_Types].xml", du: enc.encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>${trangs.map((t, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>`).join("")}</Types>`) });
+  tep.push({ ten: "_rels/.rels", du: enc.encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`) });
+  tep.push({ ten: "xl/workbook.xml", du: enc.encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook ${NS} ${R}><sheets>${trangs.map((t, i) => `<sheet name="${X(t.ten.replace(/[\[\]:*?\/\\]/g, " ").slice(0, 31))}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join("")}</sheets></workbook>`) });
+  tep.push({ ten: "xl/_rels/workbook.xml.rels", du: enc.encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${trangs.map((t, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join("")}<Relationship Id="rId${trangs.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`) });
+  tep.push({ ten: "xl/styles.xml", du: enc.encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet ${NS}><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Calibri"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FF0F766E"/><bgColor indexed="64"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`) });
+  trangs.forEach((t, i) => {
+    const rong = t.dong[0].map((h, j) => Math.min(60, Math.max(8, ...t.dong.map(d => String(d[j] == null ? "" : d[j]).length)) + 2));
+    const rows = t.dong.map((d, r) => `<row r="${r + 1}">${d.map((v, j) => { const ref = cot(j) + (r + 1), st = r === 0 ? ' s="1"' : ""; return typeof v === "number" && isFinite(v) ? `<c r="${ref}"${st}><v>${v}</v></c>` : `<c r="${ref}"${st} t="inlineStr"><is><t xml:space="preserve">${X(v == null ? "" : v)}</t></is></c>`; }).join("")}</row>`).join("");
+    tep.push({ ten: `xl/worksheets/sheet${i + 1}.xml`, du: enc.encode(`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet ${NS}><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols>${rong.map((w, j) => `<col min="${j + 1}" max="${j + 1}" width="${w}" customWidth="1"/>`).join("")}</cols><sheetData>${rows}</sheetData></worksheet>`) });
+  });
+  return zipLuu(tep);
+}
+
+function docQuanBai(ma){const n=parseInt(String(ma).split("-")[1],10);if(!(n>=1))return "";const i=(n-1)%52;return ["A","2","3","4","5","6","7","8","9","10","J","Q","K"][i%13]+" "+["Bích","Cơ","Rô","Tép"][Math.floor(i/13)]+(n>52?" (bộ 2)":"")}
+function trangPIN(lop,si){
+  const tat=[];for(let i=1;i<=si;i++)tat.push(i);const to=chiaToSTT(tat);
+  return {ten:lop,dong:[["STT","Mã học sinh","Mật khẩu (PIN)","Quân bài","Đọc là","Tổ","Họ tên (cô tự điền)"]].concat(tat.map(i=>{const m=maHS(lop,i);return [i,m,pinOf(m),quanBai(m),docQuanBai(m),"Tổ "+(to.findIndex(a=>a.includes(i))+1),""]}))};
+}
+function taiExcelPIN(){
+  const lop=Object.keys(LOP_CO).sort();
+  if(!lop.length)return toast("Chưa khai báo lớp và sĩ số");
+  luuTep(taoXlsx(lop.map(l=>trangPIN(l,LOP_CO[l]))),`Danh sach ma PIN quan bai ${lop.join(" ")}.xlsx`,"Danh sách mã PIN");
+}
 
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */

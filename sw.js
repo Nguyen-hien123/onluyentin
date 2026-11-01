@@ -1,5 +1,5 @@
-// Chinh phục Tin 11 — lưu app trên máy để mở được khi mất mạng. Bản: 20261101-2202
-const BAN = "olt-20261101-2202", TEP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
+// Chinh phục Tin 11 — lưu app trên máy để mở được khi mất mạng. Bản: 20261101-2211
+const BAN = "olt-20261101-2211", TEP = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-180.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(BAN).then(c => c.addAll(TEP))); self.skipWaiting(); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k.startsWith("olt-") && k !== BAN).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener("fetch", e => {
