@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261101-2336"</script>
+<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261101-2354"</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3ETin%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -547,7 +547,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-back]");if
 /* ══════════ ĐĂNG NHẬP ══════════ */
 function viewLogin(){
   const recent=Object.keys(MEM.users).filter(c=>/^11/.test(c)).slice(-4).reverse();
-  return `<div class="hero"><div class="logo"><svg viewBox='0 0 64 64' aria-hidden='true'><path fill='#fff' d='M4 54 24 20l10 16 6-9 20 27Z'/><path fill='#fde68a' d='M24 20l-6 10 6-3 5 3 Z'/><path stroke='#fff' stroke-width='3' d='M40 27V8'/><path fill='#fde047' d='M40 8l13 5-13 5Z'/></svg></div><h2>Chinh phục Tin học 11</h2><div class="muted">${TRUONG}</div><div class="khauhieu">Đỉnh núi của em không ở đâu xa: đó là em của ngày hôm qua.</div></div>
+  return `<div class="hero"><div class="logo"><svg viewBox='0 0 64 64' aria-hidden='true'><path fill='#fff' d='M4 54 24 20l10 16 6-9 20 27Z'/><path fill='#fde68a' d='M24 20l-6 10 6-3 5 3 Z'/><path stroke='#fff' stroke-width='3' d='M40 27V8'/><path fill='#fde047' d='M40 8l13 5-13 5Z'/></svg></div><h2>Chinh phục Tin học 11</h2><div class="muted">${TRUONG}</div><div class="khauhieu">Mỗi ngày tiến một bước, em chinh phục chính mình.</div></div>
   <div class="wrap">${khungBao()}${nutFidVao()}<div class="card">
    <label for="lop">Lớp của em</label><input id="lop" type="text" placeholder="VD: 11A3" autocomplete="off" autocapitalize="characters">
    <label for="stt">Số thứ tự trong danh sách lớp</label><input id="stt" type="tel" inputmode="numeric" placeholder="VD: 5" maxlength="2">
