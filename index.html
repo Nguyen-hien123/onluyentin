@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>window.PWA = 1;</script>
+<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261101-2314"</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3ETin%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -2000,6 +2000,23 @@ const duocXemTen=()=>GVOK&&!GVQL&&coSheet();
 document.addEventListener("mouseover",e=>{const el=e.target.closest&&e.target.closest("[data-ma]");if(el&&duocXemTen())hienTen(el)});
 document.addEventListener("mouseout",e=>{const el=e.target.closest&&e.target.closest("[data-ma]");if(el&&!(e.relatedTarget&&el.contains(e.relatedTarget)))anTen()});
 document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-ma]");if(el&&duocXemTen()){hienTen(el);clearTimeout(window.__tenT);window.__tenT=setTimeout(anTen,6000)}});
+
+/* ══════════ TỰ LẤY BẢN MỚI: GitHub cho trình duyệt giữ trang 10 phút; sw.js đọc thẳng (không qua bộ nhớ đệm) để biết có bản mới ══════════ */
+function hoiBanMoi(){
+  if(!window.BAN_APP||navigator.onLine===false)return Promise.resolve(null);
+  return fetch("sw.js?t="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const BAN = "([^"]+)"/);return m&&m[1]!==window.BAN_APP&&!location.search.includes("v="+m[1])?m[1]:null}).catch(()=>null);
+}
+const moiBan=b=>location.replace(location.pathname+"?v="+encodeURIComponent(b));
+function baoBanMoi(b){
+  if($("#banmoi"))return;
+  const n=document.createElement("button");n.id="banmoi";n.className="noprint";n.textContent="🆕 Có bản mới · bấm để cập nhật";
+  n.style.cssText="position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:30;border:0;border-radius:999px;padding:9px 16px;font-weight:700;background:#f59e0b;color:#1c1000;box-shadow:0 4px 14px rgba(0,0,0,.3);cursor:pointer";
+  n.onclick=()=>{if(VIEW&&["cong","tdc","dbc","quiz"].includes(VIEW.t)&&!VIEW.done&&!confirm("Em đang làm bài, cập nhật sẽ mất lượt này. Vẫn cập nhật?"))return;moiBan(b)};document.body.appendChild(n);
+}
+// mới mở app: tự chuyển ngay. Đang dùng: chỉ hiện nút, để không mất bài đang làm hay phiên giáo viên
+hoiBanMoi().then(b=>{if(b)moiBan(b)});
+setInterval(()=>hoiBanMoi().then(b=>{if(b)baoBanMoi(b)}),120000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)hoiBanMoi().then(b=>{if(b)baoBanMoi(b)})});
 
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */
