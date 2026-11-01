@@ -182,6 +182,16 @@ th{color:var(--muted);font-weight:600}
 .pill{display:inline-block;border-radius:8px;padding:2px 8px;font-weight:700;font-family:ui-monospace,Consolas,monospace;background:var(--brand-soft);color:var(--brand)}
 .guipill{position:fixed;left:50%;bottom:calc(68px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:19;border:0;border-radius:999px;padding:7px 14px;font:600 13px/1.3 inherit;font-family:inherit;max-width:92%;box-shadow:var(--shadow);background:var(--card);color:var(--ink);cursor:pointer;transition:opacity .4s}
 .guipill[data-tt=toi]{background:#dcfce7;color:#14532d}.guipill[data-tt=loi]{background:#fee2e2;color:#7f1d1d}.guipill.an{opacity:0;pointer-events:none}
+.dong-ho{position:fixed;right:12px;bottom:84px;z-index:10000;background:#0f172a;color:#fff;border-radius:16px;padding:8px 10px;box-shadow:0 8px 28px #0006;width:236px;font-size:13px}
+.dh-dau{display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:800;color:#fde047}.dh-dau button,.dh-phut button,.dh-nut button{border:0;border-radius:8px;background:#334155;color:#fff;padding:4px 7px;cursor:pointer;font:inherit}
+.dh-so{font:900 44px/1.1 Consolas,monospace;text-align:center;letter-spacing:2px;margin:4px 0}
+.dh-phut{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}.dh-phut button.chon{background:#f59e0b;color:#111}.dh-phut input{width:62px;padding:3px 6px;border-radius:8px;border:0}
+.dh-nut{display:flex;gap:4px;justify-content:center;margin-top:6px}.dh-nut .dh-chinh{background:#16a34a}
+.dong-ho.gon .dh-than{display:none}.dong-ho.gon{width:auto}.dong-ho.gon .dh-so{font-size:26px}
+.dong-ho.to{width:360px;bottom:auto;top:96px}.dong-ho.to .dh-so{font-size:92px}
+.dong-ho.sap-het .dh-so{color:#fca5a5;animation:dhNhay 1s infinite}.dong-ho.het-gio{background:#b91c1c;animation:dhNhay .6s 6}.dong-ho.reo{outline:4px solid #fde047}
+@keyframes dhNhay{50%{opacity:.45}}
+.dong-ho.an{display:none}
 .toast{position:fixed;left:50%;bottom:112px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:600;z-index:20;max-width:90%;text-align:center;animation:pop .25s}
 @keyframes pop{from{transform:translate(-50%,10px);opacity:0}to{transform:translate(-50%,0);opacity:1}}
 .sec-t{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:18px 4px 8px}
@@ -271,8 +281,8 @@ function totalPts(u){
   for(const so in u.lp){s+=lessonPts(u.lp[so])}
   for(const cd in u.boss){const b=u.boss[cd];s+=(b.best||0)*20+(b.pass?50:0)}
   for(const k in u.de){s+=Math.round((u.de[k]||0)*10)}
-  if(u.xp)["td","db","cong","tem","pt","ai"].forEach(k=>s+=u.xp[k]||0);
-  return s;
+  if(u.xp)["td","db","cong","tem","pt","ai","tru"].forEach(k=>s+=u.xp[k]||0);
+  return Math.max(0,s);
 }
 const LEVELS=[[0,"🌱","Mầm non số"],[500,"🔍","Nhà khám phá"],[1500,"🛡️","Hiệp sĩ số"],[3000,"💡","Chuyên gia nhí"],[6000,"🚀","Phi hành gia Tin học"],[10000,"👑","Bậc thầy Tin học"]];
 function levelOf(p){let i=0;for(let k=0;k<LEVELS.length;k++)if(p>=LEVELS[k][0])i=k;return {i,ic:LEVELS[i][1],ten:LEVELS[i][2],from:LEVELS[i][0],to:(LEVELS[i+1]||[null])[0]}}
@@ -287,8 +297,8 @@ function trackMonth(){
   if(!U||U.xem)return;
   const tp=totalPts(),n2=n2Of(U),m=thangU();
   if(U.lastPts==null){if(ym(U.t0)===ym()){m.d=tp;m.b=n2}U.lastPts=tp;U.lastN2=n2;return}
-  if(tp>U.lastPts)m.d+=tp-U.lastPts;
-  const kT=dauTuan();if(!U.tuan||U.tuan.k!==kT)U.tuan={k:kT,d:0};if(tp>U.lastPts)U.tuan.d+=tp-U.lastPts;
+  if(tp>U.lastPts)m.d+=tp-U.lastPts;else if(tp<U.lastPts)m.d=Math.max(0,m.d-(U.lastPts-tp));
+  const kT=dauTuan();if(!U.tuan||U.tuan.k!==kT)U.tuan={k:kT,d:0};U.tuan.d=Math.max(0,U.tuan.d+tp-U.lastPts);
   if(n2>U.lastN2)m.b+=n2-U.lastN2;
   U.lastPts=tp;U.lastN2=n2;
 }
@@ -311,7 +321,7 @@ function baoGui(tt,t){
 function congGon(){const C=U.cong||{},r={};Object.keys(C).forEach(k=>{r[k]=Object.assign({},C[k]);if(r[k].pt)r[k].pt={tt:r[k].pt.tt}});return r}
 function goiGui(){
   const g=U.g,all=DATA[g].bai.filter(b=>!b.cho),th=ym(),m=thangU(th);
-  const u=JSON.stringify({code:U.code,g,lp:U.lp,boss:U.boss,de:U.de,mo:U.mo,sai:U.sai.slice(-60),t0:U.t0,thang:U.thang,lastPts:U.lastPts,lastN2:U.lastN2,xp:U.xp,dbk:U.dbk,tdBest:U.tdBest,tdLuot:U.tdLuot,sanN:U.sanN,nhanN:U.nhanN,tuan:U.tuan,saiChon:U.saiChon,cong:congGon()});
+  const u=JSON.stringify({code:U.code,g,lp:U.lp,boss:U.boss,de:U.de,mo:U.mo,sai:U.sai.slice(-60),t0:U.t0,thang:U.thang,lastPts:U.lastPts,lastN2:U.lastN2,xp:U.xp,dbk:U.dbk,tdBest:U.tdBest,tdLuot:U.tdLuot,sanN:U.sanN,nhanN:U.nhanN,tuan:U.tuan,saiChon:U.saiChon,cong:congGon(),truDa:U.truDa,tbMoi:U.tbMoi});
   const d={ma:U.code,g,tong:totalPts(),bai2:n2Of(U),sao:all.reduce((s,b)=>s+((U.lp[b.so]||{}).st||0),0),
     chang:Object.values(U.boss).filter(b=>b.pass).length,deKT:U.de.chuan||0,deN:U.de.nhanh||0,th,thD:m.d,thB:m.b,thDe:m.de,dbX:Object.keys(U.dbk||{}).length,tdL:U.tdLuot||0,tuanK:(U.tuan||{}).k||0,tuanD:(U.tuan||{}).d||0,tem:soTem(),ptN:soPT(),u};
   d.ck=(h32(BIMAT+"|sync|"+[d.ma,d.tong,d.th,d.thD,d.thB,d.thDe].join("|"))%1679616).toString(36);
@@ -346,7 +356,7 @@ function taiSo(){
   const nguoi=U;
   return fetch(SHEET+"?a=hs&ma="+encodeURIComponent(nguoi.code)+"&pin="+pinOf(nguoi.code)).then(r=>r.json()).then(d=>{
     if(!d.ok)throw new Error(d.loi||"Sổ điểm chưa trả lời");
-    nguoi.so=Object.assign({},d,{td:d.td?Object.assign({},d.td,{u:undefined}):null,t:Date.now()});ghiMay();return d});
+    nguoi.so=Object.assign({},d,{td:d.td?Object.assign({},d.td,{u:undefined}):null,t:Date.now()});ghiMay();if(!nguoi.xem)apTru(nguoi,d);return d});
 }
 // đăng nhập trên máy mới: lấy lại tiến độ đã lưu trên sổ của cô
 function khoiPhuc(){
@@ -396,6 +406,7 @@ function openLessons(g){const out=[];chuongs(g).forEach((c,i)=>c.bai.forEach((b,
 let TAB="map", VIEW=null;
 function render(){
   const a=$("#app");
+  if(!U){const gp=$("#guipill");if(gp)gp.remove()}
   if(!U&&VIEW!=="gv"&&VIEW!=="gvhome"&&!(VIEW&&VIEW.t==="cn")){a.innerHTML=viewLogin();bindLogin();return}
   if(VIEW==="gv"){a.innerHTML=viewGVLogin();bindGVLogin();return}
   if(VIEW==="gvhome"){a.innerHTML=viewGV();bindGV();return}
@@ -468,7 +479,7 @@ function levelCard(){
 function starStr(n){return "★".repeat(n)+`<span class="e">${"★".repeat(3-n)}</span>`}
 function viewMap(){
   const g=U.g; const cs=chuongs(g);
-  let h=levelCard();
+  let h=theTBMoi()+levelCard();
   h+=theCai()+theKhaoSat(true);
   cs.forEach((c,i)=>{
     const open=chuongOpen(g,i);
@@ -498,7 +509,7 @@ function viewMap(){
   return h;
 }
 function bindMain(){
-  ganCai();ganKhaoSat();
+  ganCai();ganKhaoSat();ganTBMoi();
   document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;render();window.scrollTo(0,0)});
   document.querySelectorAll("[data-bai]").forEach(b=>b.onclick=()=>{VIEW={t:"bai",so:+b.dataset.bai,tab:"tt"};render()});
   document.querySelectorAll("[data-lock]").forEach(b=>b.onclick=()=>{const k=b.dataset.lock;toast(k==="cho"?"Bài này cô đang cập nhật nội dung.":k==="boss"?"Đạt ★★ ở mọi bài của chặng để mở thử thách.":"Đạt ★★ ở bài trước để mở bài này.")});
@@ -937,7 +948,7 @@ function bindGVLogin(){
 }
 function viewGV(){
   if(!GVOK){VIEW="gv";return viewGVLogin()}
-  const tabs=GVQL?[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"]]:[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"],["mg","🧩 Mảnh ghép, bể cá"],["gviec","📣 Giao việc"],["pin","🔑 Phát PIN"],["mo","🔓 Mã mở khoá"],["so","☁️ Sổ điểm"],["bc","📊 Mã báo cáo"],["xem","👀 Xem thử"]];
+  const tabs=GVQL?[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"]]:[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"],["mg","🧩 Mảnh ghép, bể cá"],["gviec","📣 Giao việc"],["dh","⏰ Đồng hồ"],["tru","⚠️ Trừ điểm"],["pin","🔑 Phát PIN"],["mo","🔓 Mã mở khoá"],["so","☁️ Sổ điểm"],["bc","📊 Mã báo cáo"],["xem","👀 Xem thử"]];
   let b="";
   if(GVTAB==="pin")b=`<div class="card noprint"><div class="row"><div><label for="glop">Lớp</label><input id="glop" type="text" placeholder="11A3" value="${esc(GV_LOP||"")}"></div><div><label for="gsi">Sĩ số</label><input id="gsi" type="tel" inputmode="numeric" value="${GV_SI||40}"></div></div><button class="btn" id="gpin">Tạo phiếu PIN</button></div><div id="pinout">${GV_LOP?pinSlips():""}</div>`;
   if(GVTAB==="mo")b=moTable();
@@ -945,6 +956,8 @@ function viewGV(){
   if(GVTAB==="ptl")b=viewPhanTich();
   if(GVTAB==="mg")b=viewManhGhep();
   if(GVTAB==="gviec")b=viewGiaoViec();
+  if(GVTAB==="dh")b=viewDongHoGV();
+  if(GVTAB==="tru")b=viewTruDiem();
   if(GVTAB==="so")b=`<div class="card">${coSheet()?`<div class="small muted">Link sổ điểm Google Sheet đã gắn vào app:</div><div class="code" style="word-break:break-all">${esc(SHEET)}</div><button class="btn" id="sogv">☁️ Lấy tổng hợp từ Google Sheet</button>`:`<div class="err">App chưa gắn link sổ điểm. Cô làm theo tệp “Huong dan so diem Google Sheet”, rồi chạy “DAT LINK GOOGLE SHEET.bat”.</div>`}<div id="somsg"></div></div><div id="soout">${GV_SO}</div>
    <div class="card small"><b>Cô làm trên Google Sheet</b><br>• Trang <b>Điểm</b>: cột A là mã HS (VD 11A3-05), các cột sau cô tự đặt tên (TX1, Giữa kỳ, Nhận xét…). Học sinh xem ở mục 📊 Điểm, cần đúng mã + PIN.<br>• Menu <b>Ôn luyện Tin → 🏅 Lập vinh danh</b>: Sheet chọn tối đa 3 em mỗi lớp cho 3 danh hiệu (Ngôi sao ôn luyện, Nhà chinh phục, Thủ khoa luyện đề). Cô gõ <b>x</b> ở cột “Công bố” thì học sinh mới thấy và tải giấy chứng nhận.<br>• Không ghi họ tên học sinh lên Sheet.</div>
    <div class="card"><b>Xem thử giấy chứng nhận</b><div class="small muted">Dữ liệu mẫu, không lưu.</div>${Object.keys(NHOM_CN).filter(k=>k!=="khac").map((k,i)=>`<button class="btn ghost" data-cnmau="${i}">${esc(k)}</button>`).join("")}</div>`;
@@ -987,10 +1000,12 @@ function bcTable(rows){
 }
 function bindGV(){
   if(!GVOK)return bindGVLogin();
-  $("#gvout").onclick=()=>{GVOK=false;GVQL=null;GVPIN="";VIEW=null;render()};
+  $("#gvout").onclick=()=>{GVOK=false;GVQL=null;GVPIN="";VIEW=null;const dh=$("#dongHo");if(dh)dh.classList.add("an");render()};
   if(GVTAB==="ptl")bindPhanTich();
   if(GVTAB==="mg")bindManhGhep();
   if(GVTAB==="gviec")bindGiaoViec();
+  if(GVTAB==="dh")bindDongHoGV();
+  if(GVTAB==="tru")bindTruDiem();
   document.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>{GVTAB=b.dataset.gt;render()});
   const gp=$("#gpin");if(gp)gp.onclick=()=>{GV_LOP=$("#glop").value;GV_SI=Math.min(60,Math.max(1,parseInt($("#gsi").value,10)||40));$("#pinout").innerHTML=pinSlips()};
   const bg=$("#bcgo");if(bg)bg.onclick=()=>{GV_BC=$("#bcin").value;const rows=readReports(GV_BC);$("#bcout").innerHTML=bcTable(rows);
@@ -1247,7 +1262,7 @@ function bindTheoDoi(){
 }
 
 /* ══════════ THEO APP CỔNG SẴN SÀNG: Cổng 7/10 · Hỏi AI · Phản tư · Hộ chiếu · Xếp hạng · Trang giáo viên lớp học ══════════ */
-const NGUONG=7,HOI_AI="";
+const NGUONG=7,HOI_AI="https://notebook.google.com/notebook/96bfae73-3bce-4626-9899-c1087f68ad1d";
 const XP_C={congNhan:4,congLuot:4,tem:80,pt:30,ai:10,aiBai:4};
 const CO_CONG={NB:4,TH:3,VD:2,VDC:1};
 function maCong(so){return String(h32(BIMAT+"|cong|11|"+so)%9000+1000)}
@@ -1362,7 +1377,7 @@ function viewAI(){
   const V=VIEW,b=baiOf(U.g,V.so),sai=V.chon!=null,t=loiNhacAI(b,V.c,V.chon);V.t2=t;
   const nut=sai?[["Đã tự tìm ra chỗ sai","💡 Em đã tự tìm ra chỗ mình hiểu sai"],["Hiểu một phần","🙂 Em hiểu được một phần"],["Vẫn chưa hiểu, cần hỏi cô","🤔 Vẫn chưa hiểu, em sẽ hỏi cô"],["Chưa hỏi AI","⏭️ Em chưa hỏi AI"]]
     :[["Hiểu sâu hơn","💡 Em giải thích lại được bằng lời của mình"],["Làm được câu khó hơn","🚀 Em làm được câu khó hơn AI cho"],["Chưa thấy hiểu thêm","🤔 Em chưa thấy hiểu thêm"],["Chưa hỏi AI","⏭️ Em chưa hỏi AI"]];
-  return topbar("🤖 Hỏi AI đúng cách",true)+`<div class="wrap"><div class="card"><div class="small">${HOI_AI?`Em bấm <b>Chép lời nhắc và mở Hỏi AI</b>, rồi dán vào ô chat.`:`Em <b>sao chép lời nhắc</b> dưới đây, dán vào trợ lý AI mà nhà trường, cô cho phép dùng.`} Lời nhắc đã dặn AI <b>${sai?"không đưa đáp án ngay":"không giải hộ"}</b> mà hỏi gợi mở để em tự suy nghĩ.</div>
+  return topbar("🤖 Hỏi AI đúng cách",true)+`<div class="wrap"><div class="card"><div class="small">${HOI_AI?`Em bấm <b>Chép lời nhắc và mở Hỏi AI</b>, rồi dán (giữ ngón tay → Dán) vào ô chat của <b>Hỏi AI – Tin học 11</b>, trợ lý của cô. Lần đầu cần đăng nhập tài khoản Google.`:`Em <b>sao chép lời nhắc</b> dưới đây, dán vào trợ lý AI mà nhà trường, cô cho phép dùng.`} Lời nhắc đã dặn AI <b>${sai?"không đưa đáp án ngay":"không giải hộ"}</b> mà hỏi gợi mở để em tự suy nghĩ.</div>
    <div class="code" style="white-space:pre-wrap;word-break:break-word;margin-top:8px;font-size:13px">${esc(t)}</div>
    <button class="btn" id="aichep">📋 ${HOI_AI?"Chép lời nhắc và mở Hỏi AI":"Sao chép lời nhắc"}</button>
    <div class="err small" style="font-weight:500">✋ Ba điều cần nhớ: (1) không đưa họ tên, ảnh, số điện thoại của mình vào; (2) AI có thể sai, đối chiếu lại với SGK trang ${esc(b.trang)}; (3) tự mình trả lời, AI chỉ gợi ý.</div></div>
@@ -1454,6 +1469,7 @@ function ganXepHang(){
 }
 
 /* ── Trang giáo viên: Phân tích lớp · Mảnh ghép, bể cá · Giao việc */
+let MG_VANG=[],MG_NHOM=[],MG_TRONG=[];
 let GVQL=null,PT_LOP="",PT_BAI=1,PT_D=null,MG_KQ="",GV_TIN="";
 const lopGV=()=>Object.keys(LOP_CO).filter(l=>!GVQL||GVQL.includes(l)).sort();
 const chonLopBai=(idL,idB,lop,bai)=>`<div class="row"><div><label for="${idL}" style="margin-top:0">Lớp</label><select id="${idL}">${lopGV().map(l=>`<option ${l===lop?"selected":""}>${esc(l)}</option>`).join("")}</select></div>
@@ -1503,7 +1519,9 @@ function bindManhGhep(){
     const nhom=Array.from({length:sn},()=>[]);let d=0;co.forEach((a,k)=>a.forEach(i=>{nhom[d%sn].push([i,k]);d++}));
     const the=(i,k)=>`<span class="pill" style="background:${MAU_TO[k]};color:#fff;margin:2px">${i} · ${quanBai(PT_LOP+"-"+i)}${san.has(i)?" ★":""}</span>`;
     const coMat=tat.filter(i=>!vang.has(i)),sanCo=coMat.filter(i=>san.has(i)),chua=coMat.filter(i=>!san.has(i));
+    MG_VANG=[...vang];MG_NHOM=nhom.map(a=>a.map(x=>x[0]));
     const trong=[...chonNN(sanCo,3),...chonNN(chua,3)];while(trong.length<6&&coMat.length>trong.length){const r=chonNN(coMat.filter(i=>!trong.includes(i)),1)[0];if(r==null)break;trong.push(r)}
+    MG_TRONG=trong.slice();
     const toCua=i=>to.findIndex(a=>a.includes(i));
     MG_KQ=`<div class="card"><b>4 tổ theo số thứ tự · lớp ${esc(PT_LOP)}</b>${to.map((a,k)=>`<div style="margin-top:6px"><b class="small">Tổ ${k+1}</b><br>${a.map(i=>vang.has(i)?`<span class="pill" style="opacity:.5;margin:2px">${i} vắng</span>`:the(i,k)).join("")}</div>`).join("")}</div>
      <div class="card"><b>🧩 ${sn} nhóm mảnh ghép</b>${nhom.map((a,n)=>`<div style="margin-top:6px"><b class="small">Nhóm ${n+1}</b><br>${a.map(x=>the(x[0],x[1])).join("")}</div>`).join("")}${sn*4>coMat.length?'<div class="err">Số nhóm nhiều quá, có nhóm không đủ 4 tổ.</div>':""}</div>
@@ -1526,6 +1544,144 @@ function bindGiaoViec(){
     GV_TIN=`Lớp ${PT_LOP} thân mến,\nCác em vào app Chinh phục Tin học 11: ${TRANG_APP}\nBài ${b.so}. ${b.ten} (SGK trang ${b.trang})\n1. Đọc Trọng tâm, ôn Sơ đồ, Luyện tập.\n2. Vượt Cổng ${NGUONG}/10 — mã mở Cổng: ${maCong(b.so)}\n3. Câu sai: bấm Hỏi AI đúng cách, rồi làm lượt mới.\n4. Viết Phản tư để nhận tem hộ chiếu.\n${h?"Hạn: "+h+"\n":""}Kết quả tự gửi về cô, các em nhìn thấy dòng "Cô đã nhận kết quả" là xong.`;render()};
   const c=$("#gvchep");if(c)c.onclick=()=>{(navigator.clipboard?navigator.clipboard.writeText(GV_TIN):Promise.reject()).then(()=>toast("Đã chép ✓"),()=>toast("Máy chưa cho sao chép"))};
 }
+
+/* ══════════ TRỪ ĐIỂM "KHÔNG HỢP TÁC": điểm tích luỹ trò chơi, không phải điểm học tập. Cô ghi lên Sheet, app từng em tự trừ khi nhận tin ══════════ */
+const XP_TRU=8,LY_TRU=["Không vào vị trí đúng thời gian","Không tuân thủ nội quy thảo luận","Không thực hiện nhiệm vụ học tập"];
+function apTru(nguoi,d){
+  const ds=d.tru||[];nguoi.truDa=nguoi.truDa||{};let moi=0;
+  ds.forEach(t=>{if(nguoi.truDa[t.id])return;nguoi.truDa[t.id]=1;moi++;const x=nguoi.xp||(nguoi.xp={td:0,db:0,tuan:{}});
+    x.tru=(x.tru||0)+(t.kieu==="Hoàn"?XP_TRU:-XP_TRU);
+    (nguoi.tbMoi=nguoi.tbMoi||[]).push(t.kieu==="Hoàn"?`↩️ ${GV} hoàn lại ${XP_TRU} ⭐ đã trừ (${t.ai}).`:`⚠️ ${t.ai} — lỗi không hợp tác (${t.ly}): −${XP_TRU} ⭐ điểm tích luỹ. Lần sau cùng nhau giữ đúng nội quy, hợp tác cùng nhóm nhé!`)});
+  if(moi&&nguoi===U){save();if(!VIEW)render()}else if(moi)ghiMay();
+}
+function theTBMoi(){const a=U.tbMoi||[];return a.length?`<div class="card" style="border:2px solid var(--gold)"><b>📣 Tin từ ${GV}</b>${a.map(t=>`<div class="small" style="margin-top:6px">${esc(t)}</div>`).join("")}<div class="small muted" style="margin-top:6px">Đây là điểm tích luỹ trò chơi, không phải điểm học tập.</div><button class="btn ghost" id="tbok">Em đã đọc</button></div>`:""}
+function ganTBMoi(){const b=$("#tbok");if(b)b.onclick=()=>{U.tbMoi=[];ghiMay();render()}}
+let TRU_LOAI="hs",TRU_SO=null,TRU_MSG="";
+const maLop=(l,i)=>l+"-"+String(i).padStart(2,"0");
+function viewTruDiem(){
+  PT_LOP=PT_LOP||lopGV()[0]||"";const si=LOP_CO[PT_LOP]||0,tat=[];for(let i=1;i<=si;i++)tat.push(i);const to=chiaToSTT(tat);
+  const ds=TRU_LOAI==="to"?to.map((a,k)=>[k,`Tổ ${k+1} (${a[0]}→${a[a.length-1]})`]):TRU_LOAI==="hs"?tat.map(i=>[i,`STT ${i} · ${quanBai(maLop(PT_LOP,i))}`]):TRU_LOAI==="mg"?MG_NHOM.map((a,k)=>[k,`Nhóm mảnh ghép ${k+1} (${a.join(", ")})`]):MG_TRONG.length?[[0,`Vòng trong bể cá (${MG_TRONG.join(", ")})`]]:[];
+  return `<div class="card"><b>⚠️ Trừ điểm “không hợp tác” · −${XP_TRU} ⭐</b><div class="small muted" style="margin-top:4px">Trừ điểm tích luỹ trò chơi, <b>không phải điểm học tập</b>. Bạn vắng không bị trừ. Mỗi em chỉ thấy tin của mình.</div>
+   <div class="row"><div><label for="trulop">Lớp</label><select id="trulop">${lopGV().map(l=>`<option ${l===PT_LOP?"selected":""}>${esc(l)}</option>`).join("")}</select></div><div><label for="truloai">Đối tượng</label><select id="truloai">${[["hs","Cá nhân"],["to","Cả tổ"],["mg","Nhóm mảnh ghép"],["be","Nhóm bể cá"]].map(o=>`<option value="${o[0]}" ${o[0]===TRU_LOAI?"selected":""}>${o[1]}</option>`).join("")}</select></div></div>
+   ${ds.length?`<label for="truai">Chọn</label><select id="truai">${ds.map(d=>`<option value="${d[0]}">${esc(d[1])}</option>`).join("")}</select>`:`<div class="err">Chưa chia nhóm: cô vào tab 🧩 Mảnh ghép, bể cá bấm Chia trước.</div>`}
+   <label for="truly">Lí do</label><input id="truly" list="trulyds" value="${esc(LY_TRU[0])}"><datalist id="trulyds">${LY_TRU.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
+   <label for="truvang">STT vắng hôm nay</label><input id="truvang" value="${esc(MG_VANG.join(", "))}" placeholder="VD: 3, 17">
+   <button class="btn" id="trugo" style="background:#b91c1c;color:#fff" ${ds.length?"":"disabled"}>−${XP_TRU} ⭐</button><div id="trumsg">${TRU_MSG}</div></div>
+   <div class="card"><div class="row" style="align-items:center"><b style="flex:2">📒 Sổ trừ điểm · ${esc(PT_LOP)}</b><button class="btn ghost" id="trutai" style="margin:0;flex:1;padding:8px;font-size:14px">🔄 Lấy sổ</button></div>
+   ${TRU_SO?(TRU_SO.length?TRU_SO.map(t=>`<div class="small" style="margin-top:8px;${t.hoan?"opacity:.55":""}"><b>${esc(t.luc)} · ${esc(t.ai)}</b> (${t.ds.length} em) · ${esc(t.ly)}${t.hoan?" · ↩️ đã hoàn":` <button class="chip" data-hoan="${esc(t.id)}">↩️ Hoàn điểm</button>`}</div>`).join(""):'<div class="small muted">Chưa có lần trừ nào.</div>'):""}</div>`;
+}
+function guiTru(d){return fetch(SHEET,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(Object.assign({loai:"tru",gv:GVPIN},d))})}
+function laySoTru(){return fetch(SHEET+"?a=gvtru&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(PT_LOP)).then(r=>r.json()).then(d=>{if(!d.ok)throw new Error(d.loi);TRU_SO=d.ds;return d.ds})}
+function bindTruDiem(){
+  const l=$("#trulop"),lo=$("#truloai"),g=$("#trugo");if(!g)return;
+  l.onchange=()=>{PT_LOP=l.value;TRU_SO=null;MG_NHOM=[];MG_TRONG=[];TRU_MSG="";render()};lo.onchange=()=>{TRU_LOAI=lo.value;TRU_MSG="";render()};
+  const tai=()=>laySoTru().then(()=>render()).catch(e=>{TRU_MSG=`<div class="err">${esc(e.message||"Chưa lấy được, cần có mạng và Apps Script mới.")}</div>`;render()});
+  $("#trutai").onclick=tai;
+  g.onclick=()=>{
+    const si=LOP_CO[PT_LOP]||0,tat=[];for(let i=1;i<=si;i++)tat.push(i);const to=chiaToSTT(tat),v=+$("#truai").value;
+    const stt=TRU_LOAI==="to"?to[v]:TRU_LOAI==="hs"?[v]:TRU_LOAI==="mg"?MG_NHOM[v]:MG_TRONG;
+    const vang=new Set(($("#truvang").value.match(/\d+/g)||[]).map(Number)),ds=stt.filter(i=>!vang.has(i));
+    const ai=TRU_LOAI==="to"?`Tổ ${v+1}`:TRU_LOAI==="hs"?`STT ${v}`:TRU_LOAI==="mg"?`Nhóm mảnh ghép ${v+1}`:"Nhóm bể cá",ly=$("#truly").value.trim()||LY_TRU[0];
+    if(!ds.length)return toast("Không có bạn nào để trừ");
+    if(!confirm(`Trừ ${XP_TRU} ⭐ điểm tích luỹ\n${ai} · lớp ${PT_LOP}: STT ${ds.join(", ")}\nLí do: ${ly}\nBấm OK để trừ.`))return;
+    g.disabled=true;
+    guiTru({id:"tru"+Date.now(),kieu:"Trừ",lop:PT_LOP,ai,ly,ds:ds.map(i=>maLop(PT_LOP,i))}).then(()=>new Promise(r=>setTimeout(r,1500))).then(laySoTru)
+     .then(()=>{TRU_MSG=`<div class="okmsg">✓ Đã ghi lên Sheet. App từng em tự trừ khi có mạng.</div>`;render()}).catch(()=>{TRU_MSG=`<div class="err">Chưa ghi được: cần có mạng và Apps Script mới. Cô thử lại nhé.</div>`;render()});
+  };
+  document.querySelectorAll("[data-hoan]").forEach(x=>x.onclick=()=>{const t=TRU_SO.find(z=>z.id===x.dataset.hoan);if(!t||!confirm(`Hoàn lại ${XP_TRU} ⭐ cho ${t.ai} (${t.ds.join(", ")})?`))return;
+    guiTru({id:t.id+"h",kieu:"Hoàn",lop:PT_LOP,ai:t.ai,ly:t.ly,ds:t.ds}).then(()=>new Promise(r=>setTimeout(r,1500))).then(tai).catch(()=>toast("Chưa hoàn được, cô thử lại nhé"))});
+}
+
+/* ══════════ ĐỒNG HỒ TRÊN LỚP (chuông hết giờ, chuông vào lớp, nhạc nền) — theo Cổng sẵn sàng ══════════ */
+let amCtx = null;
+const am = () => { amCtx = amCtx || new (window.AudioContext || window.webkitAudioContext)(); if (amCtx.state === "suspended") amCtx.resume(); return amCtx; };
+let amRa = null;
+function amTo(){
+  const c = am();
+  if (!amRa) { const n = c.createDynamicsCompressor(), g = c.createGain(); n.threshold.value = -24; n.knee.value = 0; n.ratio.value = 20; n.attack.value = .002; n.release.value = .1; g.gain.value = 2.2; amRa = c.createGain(); amRa.gain.value = 6; amRa.connect(n); n.connect(g); g.connect(c.destination); }
+  return amRa;
+}
+function chuongHetGio(){   // 5 tiếng "boong" ngân, to hết cỡ
+  const c = am(), t0 = c.currentTime + .05, ra = amTo();
+  for (let k = 0; k < 5; k++) [660, 1320, 1980].forEach((f, i) => {
+    const o = c.createOscillator(), g = c.createGain(), t = t0 + k * 1.1; o.type = i ? "sine" : "triangle"; o.frequency.value = f;
+    g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(.6 / (i + 1), t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + 1.05);
+    o.connect(g); g.connect(ra); o.start(t); o.stop(t + 1.1);
+  });
+}
+function chuongVaoLop(){   // chuông điện trường học: búa gõ 22 lần/giây trong 4 giây
+  const c = am(), t0 = c.currentTime + .05, T = 4, g = c.createGain(); g.gain.value = .0001; g.connect(amTo());
+  [1180, 1760, 2350].forEach((f, i) => { const o = c.createOscillator(), gg = c.createGain(); o.type = i ? "sine" : "triangle"; o.frequency.value = f; gg.gain.value = [1, .5, .25][i]; o.connect(gg); gg.connect(g); o.start(t0); o.stop(t0 + T + .6); });
+  for (let i = 0; i < T * 22; i++) { const t = t0 + i / 22; g.gain.setValueAtTime(.22, t); g.gain.exponentialRampToValueAtTime(.05, t + .04); }
+  g.gain.setValueAtTime(.2, t0 + T); g.gain.exponentialRampToValueAtTime(.0001, t0 + T + .5);
+}
+const DH = { tong: 5 * 60000, con: 5 * 60000, het: 0, chay: false, dem: null };
+const mmss = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
+function capNhatDH(){ const e = $("#dhLB"); if (e) e.textContent = PT_LOP ? "📍 " + PT_LOP + " · Bài " + PT_BAI : "⏰ Đồng hồ"; }
+// nhạc nền yên tĩnh khi các em làm nhiệm vụ: app tự tạo tiếng (không dùng bản nhạc có bản quyền, không cần mạng), hoà âm chậm + vài nốt thưa
+const NHAC_HOA = [[130.81, 196, 246.94, 329.63], [110, 164.81, 261.63, 329.63], [87.31, 174.61, 220, 329.63], [98, 146.83, 220, 293.66]], NHAC_NOT = [523.25, 587.33, 659.25, 783.99, 880];
+let nhacChay = null;
+function batNhac(){
+  if (nhacChay) return;
+  const c = am(), ra = c.createGain(), loc = c.createBiquadFilter(), tre = c.createDelay(), hoi = c.createGain();
+  loc.type = "lowpass"; loc.frequency.value = 1400; tre.delayTime.value = .45; hoi.gain.value = .35;
+  ra.gain.setValueAtTime(.0001, c.currentTime); ra.gain.exponentialRampToValueAtTime(.5, c.currentTime + 2);
+  loc.connect(ra); tre.connect(hoi); hoi.connect(tre); tre.connect(ra); ra.connect(c.destination);
+  const n = { ra, luc: c.currentTime + .1, k: 0 };
+  const tieng = (f, t, dai, muc, kieu) => { const o = c.createOscillator(), g = c.createGain(); o.type = kieu; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(muc, t + dai * .25); g.gain.setValueAtTime(muc, t + dai * .75); g.gain.linearRampToValueAtTime(0, t + dai); o.connect(g); g.connect(loc); if (kieu === "sine" && muc < .1) g.connect(tre); o.start(t); o.stop(t + dai + .05); };
+  // mỗi hợp âm 8 giây, chồng lên nhau 2 giây cho liền tiếng; xếp trước 16 giây để không bị ngắt khi máy bận
+  const xep = () => {
+    while (n.luc < c.currentTime + 16) {
+      NHAC_HOA[n.k++ % NHAC_HOA.length].forEach(f => tieng(f, n.luc, 10, .09, "triangle"));
+      for (let i = 0; i < 2; i++) if (Math.random() < .75) tieng(NHAC_NOT[Math.floor(Math.random() * NHAC_NOT.length)], n.luc + 1 + i * 3 + Math.random(), 3.5, .05, "sine");
+      n.luc += 8;
+    }
+  };
+  xep(); n.dem = setInterval(xep, 4000); nhacChay = n;
+}
+function tatNhac(){
+  if (!nhacChay) return;
+  const n = nhacChay, c = am(); nhacChay = null; clearInterval(n.dem);
+  n.ra.gain.cancelScheduledValues(c.currentTime); n.ra.gain.setValueAtTime(Math.max(n.ra.gain.value, .0001), c.currentTime); n.ra.gain.exponentialRampToValueAtTime(.0001, c.currentTime + 1);
+  setTimeout(() => { try { n.ra.disconnect(); } catch (e) {} }, 1200);
+}
+function hienDongHo(){
+  let w = $("#dongHo");
+  if (!w) {
+    document.body.insertAdjacentHTML("beforeend", `<div id="dongHo" class="dong-ho noprint"><div class="dh-dau"><span id="dhLB"></span><span><button id="dhTo" title="Phóng to khi chiếu">⛶</button><button id="dhThu" title="Thu gọn">–</button></span></div>
+      <div class="dh-so" id="dhSo">05:00</div>
+      <div class="dh-than"><div class="dh-phut">${[1, 2, 3, 5, 7, 10, 15].map(p => `<button data-phut="${p}">${p}′</button>`).join("")}</div>
+      <div class="dh-phut" style="margin-top:6px;align-items:center"><input type="number" id="dhNhap" min="0" max="180" inputmode="numeric" placeholder="phút" aria-label="Số phút" style="width:64px;font-size:16px"><input type="number" id="dhGiay" min="0" max="59" inputmode="numeric" placeholder="giây" aria-label="Số giây" style="width:64px;font-size:16px"><button id="dhChon">✔ Chọn giờ</button></div>
+      <div class="dh-nut"><button id="dhChay" class="dh-chinh">▶ Bắt đầu</button><button id="dhLai">↺</button><button id="dhChuong" title="Chuông gọi vào lớp">🔔 Vào lớp</button></div>
+      <div class="dh-nut" style="margin-top:6px"><button id="dhNhac" aria-pressed="false" title="Nhạc nhẹ không lời khi đồng hồ chạy">🎵 Nhạc nền: tắt</button></div></div></div>`);
+    w = $("#dongHo");
+    const ve = () => { const con = DH.chay ? DH.het - Date.now() : DH.con; $("#dhSo").textContent = mmss(con); w.classList.toggle("sap-het", DH.chay && con <= 10000); $("#dhChay").textContent = DH.chay ? "⏸ Dừng" : DH.con < DH.tong && DH.con > 0 ? "▶ Tiếp" : "▶ Bắt đầu"; };
+    const veNhac = () => { const b = $("#dhNhac"); b.textContent = "🎵 Nhạc nền: " + (DH.nhac ? "bật" : "tắt"); b.setAttribute("aria-pressed", DH.nhac ? "true" : "false"); b.style.background = DH.nhac ? "#0d9488" : ""; b.style.color = DH.nhac ? "#fff" : ""; };
+    $("#dhNhac").onclick = () => { am(); DH.nhac = !DH.nhac; veNhac(); if (!DH.nhac) tatNhac(); else if (DH.chay) batNhac(); };
+    const datPhut = p => { if (!(p > 0)) return; tatNhac(); DH.chay = false; DH.tong = DH.con = Math.round(p * 60000); w.classList.remove("het-gio"); ve(); w.querySelectorAll("[data-phut]").forEach(b => b.classList.toggle("chon", +b.dataset.phut === p)); };
+    w.querySelectorAll("[data-phut]").forEach(b => b.onclick = () => { $("#dhNhap").value = ""; $("#dhGiay").value = ""; datPhut(+b.dataset.phut); });
+    const tuGo = () => { const p = (+$("#dhNhap").value || 0) + (+$("#dhGiay").value || 0) / 60; if (!(p > 0)) return toast("Cô gõ số phút hoặc số giây nhé"); datPhut(p); };
+    $("#dhChon").onclick = tuGo;
+    ["#dhNhap", "#dhGiay"].forEach(s => { $(s).onkeydown = e => { if (e.key === "Enter") tuGo(); }; });
+    $("#dhChay").onclick = () => {
+      am(); w.classList.remove("het-gio");
+      if (DH.chay) { DH.con = DH.het - Date.now(); DH.chay = false; tatNhac(); }
+      else { if (DH.con <= 0) DH.con = DH.tong; DH.het = Date.now() + DH.con; DH.chay = true; if (DH.nhac) batNhac(); }
+      ve();
+    };
+    $("#dhLai").onclick = () => { tatNhac(); DH.chay = false; DH.con = DH.tong; w.classList.remove("het-gio"); ve(); };
+    $("#dhChuong").onclick = () => { chuongVaoLop(); w.classList.add("reo"); setTimeout(() => w.classList.remove("reo"), 4200); };
+    $("#dhThu").onclick = () => w.classList.toggle("gon");
+    $("#dhTo").onclick = () => w.classList.toggle("to");
+    DH.dem = setInterval(() => { if (!DH.chay) return; if (DH.het - Date.now() <= 0) { DH.chay = false; DH.con = 0; w.classList.add("het-gio"); tatNhac(); chuongHetGio(); } ve(); }, 200);
+    datPhut(5);
+  }
+  w.classList.remove("an"); capNhatDH();
+}
+
+
+function viewDongHoGV(){return `<div class="card"><b>⏰ Đồng hồ trên lớp</b><div class="small muted" style="margin-top:4px">Đồng hồ nổi ở góc màn hình, vẫn chạy khi cô chuyển tab. Bấm ⛶ để phóng to khi chiếu. Hết giờ chuông reo 5 tiếng; có chuông gọi vào lớp và nhạc nền nhẹ do app tự tạo, không cần mạng.</div><button class="btn" id="dhmo">⏰ Mở đồng hồ</button></div>`}
+function bindDongHoGV(){const b=$("#dhmo");if(b)b.onclick=hienDongHo}
 
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */
