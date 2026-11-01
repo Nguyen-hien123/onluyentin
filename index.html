@@ -317,6 +317,9 @@ body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:40vh;backg
 .qb.dang{border-color:#f59e0b;background:#fef3c7}.qb.dang .stt{background:#d97706}
 .qb.chua{border-color:#94a3b8;background:#e2e8f0}
 @media print{.thanhxem,.nutdau{display:none}}
+#tenNoi{position:fixed;z-index:99;background:#111033;color:#fff;padding:7px 12px;border-radius:10px;font-weight:700;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:90vw;pointer-events:none}
+[data-ma]{cursor:help}
+@media print{#tenNoi{display:none}}
 </style>
 </head>
 <body>
@@ -1092,7 +1095,7 @@ function viewGV(){
 let GV_SOLOP="",GV_SODS=null,GV_SOTH="";
 function veSoLop(){
   const ds=(GV_SODS||[]).filter(r=>r.ma.split("-")[0]===GV_SOLOP).sort((a,b)=>a.ma.localeCompare(b.ma,"vi",{numeric:true}));
-  return ds.length?`<div class="card"><div class="small muted" style="margin-bottom:6px">Lớp ${esc(GV_SOLOP)}: ${ds.length} học sinh · “Tháng này” = điểm thưởng ${tenThang(GV_SOTH)}</div><table><tr><th>Mã HS</th><th>Điểm thưởng</th><th>Tháng này</th><th>Bài ★★</th><th>Chặng</th><th>Đề KT</th><th>Gửi lúc</th></tr>${ds.map(r=>`<tr><td><b>${esc(r.ma)}</b></td><td>${r.tong}</td><td>${r.thD}</td><td>${r.bai2}</td><td>${r.chang}</td><td>${so(r.deKT)}</td><td class="small">${esc(String(r.luc).slice(0,16))}</td></tr>`).join("")}</table></div>`:`<div class="card small muted">Lớp ${esc(GV_SOLOP)} chưa có học sinh nào gửi tiến độ.</div>`;
+  return ds.length?`<div class="card"><div class="small muted" style="margin-bottom:6px">Lớp ${esc(GV_SOLOP)}: ${ds.length} học sinh · “Tháng này” = điểm thưởng ${tenThang(GV_SOTH)}</div><table><tr><th>Mã HS</th><th>Điểm thưởng</th><th>Tháng này</th><th>Bài ★★</th><th>Chặng</th><th>Đề KT</th><th>Gửi lúc</th></tr>${ds.map(r=>`<tr><td data-ma="${esc(r.ma)}"><b>${esc(r.ma)}</b></td><td>${r.tong}</td><td>${r.thD}</td><td>${r.bai2}</td><td>${r.chang}</td><td>${so(r.deKT)}</td><td class="small">${esc(String(r.luc).slice(0,16))}</td></tr>`).join("")}</table></div>`:`<div class="card small muted">Lớp ${esc(GV_SOLOP)} chưa có học sinh nào gửi tiến độ.</div>`;
 }
 let GV_LOP="",GV_SI=40,GV_BC="",GV_SO="",GVPIN="";
 function pinSlips(){
@@ -1127,7 +1130,7 @@ function bcTable(rows){
 }
 function bindGV(){
   if(!GVOK)return bindGVLogin();
-  $("#gvout").onclick=()=>{GVOK=false;GVQL=null;GVPIN="";VIEW=null;const dh=$("#dongHo");if(dh)dh.classList.add("an");render()};
+  $("#gvout").onclick=()=>{TEN_LOP={};anTen();GVOK=false;GVQL=null;GVPIN="";VIEW=null;const dh=$("#dongHo");if(dh)dh.classList.add("an");render()};
   if(GVTAB==="ptl")bindPhanTich();
   if(GVTAB==="mg")bindManhGhep();
   if(GVTAB==="gviec")bindGiaoViec();
@@ -1370,7 +1373,7 @@ function coRoi(r){return TD_BAI?+(r&&r.roiB)||0:+(r&&r.roiN)||0}
 function quaCong(r){return !!r&&(TD_BAI?+r.caoB>=NGUONG:+r.congDat>0)}
 function theQB(i,r){
   const ma=maLop(TD_LOP,i),cl=!r?"chua":quaCong(r)?"qua":"dang",roi=coRoi(r);
-  return `<div class="qb ${cl}" title="${esc(ma)}"><span class="stt">${i}</span><span class="la" style="${/[♥♦]/.test(quanBai(ma))?"color:#b91c1c":"color:#111827"}">${quanBai(ma)}</span>${roi?`<span class="roi">👀${roi}</span>`:""}</div>`;
+  return `<div class="qb ${cl}" data-ma="${esc(ma)}"><span class="stt">${i}</span><span class="la" style="${/[♥♦]/.test(quanBai(ma))?"color:#b91c1c":"color:#111827"}">${quanBai(ma)}</span>${roi?`<span class="roi">👀${roi}</span>`:""}</div>`;
 }
 function viewTheoDoi(){
   const ls=lopGV();if(!TD_LOP)TD_LOP=ls[0]||"";
@@ -1396,7 +1399,7 @@ function viewTheoDoi(){
   const loc=TD_LOC?TD_NHOM.find(n=>n[0]===TD_LOC):null;
   if(loc)h+=`<div class="card"><b>${loc[1]} · lớp ${esc(TD_LOP)}</b><div class="luoiqb" style="margin-top:8px">${rows.filter(([_,r])=>loc[2](r)).map(([i,r])=>theQB(i,r)).join("")||'<span class="small muted">Không có em nào.</span>'}</div></div>`;
   h+=`<div class="card bang-td"><table><tr><th>STT</th><th>Trạng thái</th><th>⭐</th><th>Bài ★★</th><th>🛂</th><th>🪞</th><th>👀</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>Gửi lúc</th></tr>
-   ${rows.map(([i,r])=>`<tr><td><b>${i}</b> <span class="small muted">${quanBai(TD_LOP+"-"+i)}</span></td><td>${!r?"🚫 Chưa vào":(+r.bai2>0||+r.tong>0)?"✏️ Đang học":"👤 Mới vào"}</td><td>${r?r.tong:""}</td><td>${r?r.bai2:""}</td><td>${r?r.tem||0:""}</td><td>${r?r.ptN||0:""}</td><td>${r?coRoi(r):""}</td><td>${r?r.dbX||0:""}</td><td>${r?r.san||0:""}</td><td>${r?r.nhan||0:""}</td><td class="small">${r?esc(String(r.luc).slice(0,16)):""}</td></tr>`).join("")}</table>
+   ${rows.map(([i,r])=>`<tr><td data-ma="${esc(maLop(TD_LOP,i))}"><b>${i}</b> <span class="small muted">${quanBai(maLop(TD_LOP,i))}</span></td><td>${!r?"🚫 Chưa vào":(+r.bai2>0||+r.tong>0)?"✏️ Đang học":"👤 Mới vào"}</td><td>${r?r.tong:""}</td><td>${r?r.bai2:""}</td><td>${r?r.tem||0:""}</td><td>${r?r.ptN||0:""}</td><td>${r?coRoi(r):""}</td><td>${r?r.dbX||0:""}</td><td>${r?r.san||0:""}</td><td>${r?r.nhan||0:""}</td><td class="small">${r?esc(String(r.luc).slice(0,16)):""}</td></tr>`).join("")}</table>
    <div class="small muted" style="margin-top:6px">👀 số lần rời tab khi làm bài · 🌸 gói đặc biệt đã xong · ⚔️ lời thách lên sàn · 🤝 lần nhận lời. Chỉ có mã Lớp-STT.</div></div>`;
   return h;
 }
@@ -1646,10 +1649,10 @@ function viewPhanTich(){
    <div class="tile"><div class="v">${tb(D.cong,"dau")} → ${tb(D.cong,"cao")}</div><div class="l">điểm lượt đầu → cao nhất (TB)</div></div><div class="tile"><div class="v">${D.ai.em} em · ${D.ai.luot}</div><div class="l">Hỏi AI (em · lượt), ${D.ai.tim} lần tự tìm ra</div></div></div>`;
   h+=`<div class="card"><b>❌ Câu sai nhiều nhất</b>${D.cau.slice(0,6).map(c=>`<div class="small" style="margin-top:6px"><span class="pill">${c.n} lượt</span> ${esc(c.q)}…</div>`).join("")||'<div class="small muted">Chưa có.</div>'}
    ${D.cau.length?`<button class="btn ghost" id="ptchep">📋 Chép lời nhắc: nhờ AI gợi ý 5 phút chốt đầu tiết sau</button>`:""}</div>`;
-  const nhom=(t,k)=>{const a=D.pt.filter(p=>p[k]);return a.length?`<div class="card"><b>${t}</b>${a.map(p=>`<div class="small" style="margin-top:6px"><span class="pill">${esc(quanBai(p.ma))}</span> ${esc(p[k])}</div>`).join("")}</div>`:""};
+  const nhom=(t,k)=>{const a=D.pt.filter(p=>p[k]);return a.length?`<div class="card"><b>${t}</b>${a.map(p=>`<div class="small" style="margin-top:6px"><span class="pill" data-ma="${esc(p.ma)}">${esc(quanBai(p.ma))}</span> ${esc(p[k])}</div>`).join("")}</div>`:""};
   h+=`<div class="card small">🪞 ${D.pt.length} phản tư · tự tin trung bình <b>${tb(D.pt,"tt")}/5</b></div>`+nhom("🤔 Điều học sinh còn băn khoăn","bk")+nhom("❓ Câu hỏi gửi cô","hoi");
   const ra=D.pt.filter(p=>p.raq);
-  if(ra.length)h+=`<div class="card"><b>✍️ Câu học sinh tự ra</b>${ra.map(p=>`<div class="small" style="margin-top:6px"><span class="pill">${esc(p.ma)}</span> ${esc(p.raq)}<br>✔️ ${esc(p.rad)} · ✗ ${esc(p.ras)}</div>`).join("")}</div>`;
+  if(ra.length)h+=`<div class="card"><b>✍️ Câu học sinh tự ra</b>${ra.map(p=>`<div class="small" style="margin-top:6px"><span class="pill" data-ma="${esc(p.ma)}">${esc(p.ma)}</span> ${esc(p.raq)}<br>✔️ ${esc(p.rad)} · ✗ ${esc(p.ras)}</div>`).join("")}</div>`;
   PT_D.loiNhac=`Tôi là giáo viên Tin học 11 (KNTT, định hướng Tin học ứng dụng), lớp vừa làm Cổng kiểm tra Bài ${b.so}: ${b.ten} (SGK trang ${b.trang}).\nCác câu học sinh sai nhiều nhất (số lượt sai):\n${D.cau.slice(0,6).map(c=>`- (${c.n}) ${c.q}…`).join("\n")}\nĐiều học sinh còn băn khoăn:\n${D.pt.filter(p=>p.bk).slice(0,15).map(p=>"- "+p.bk).join("\n")}\nHãy gợi ý nội dung tôi chốt trong 5 phút đầu tiết sau: 3 ý cần làm rõ (bám SGK, nêu trang), 1 ví dụ đời sống, 1 câu hỏi cho thảo luận bể cá. Không tự thêm số liệu. Tôi sẽ duyệt và sửa trước khi dùng.`;
   return h;
 }
@@ -1679,7 +1682,7 @@ function bindManhGhep(){
     const tat=[];for(let i=1;i<=si;i++)tat.push(i);
     const to=chiaToSTT(tat),co=to.map(a=>a.filter(i=>!vang.has(i)));
     const nhom=Array.from({length:sn},()=>[]);let d=0;co.forEach((a,k)=>a.forEach(i=>{nhom[d%sn].push([i,k]);d++}));
-    const the=(i,k)=>`<span class="pill" style="background:${MAU_TO[k]};color:#fff;margin:2px">${i} · ${quanBai(PT_LOP+"-"+i)}${san.has(i)?" ★":""}</span>`;
+    const the=(i,k)=>`<span class="pill" data-ma="${maLop(PT_LOP,i)}" style="background:${MAU_TO[k]};color:#fff;margin:2px">${i} · ${quanBai(PT_LOP+"-"+i)}${san.has(i)?" ★":""}</span>`;
     const coMat=tat.filter(i=>!vang.has(i)),sanCo=coMat.filter(i=>san.has(i)),chua=coMat.filter(i=>!san.has(i));
     MG_VANG=[...vang];MG_NHOM=nhom.map(a=>a.map(x=>x[0]));
     const trong=[...chonNN(sanCo,3),...chonNN(chua,3)];while(trong.length<6&&coMat.length>trong.length){const r=chonNN(coMat.filter(i=>!trong.includes(i)),1)[0];if(r==null)break;trong.push(r)}
@@ -1975,6 +1978,28 @@ function nutFidGV(){return coTheFid()&&dsFid().gv?`<button class="btn gold" id="
 function ganFidGVVao(){
   const b=$("#fgvao");if(b)b.onclick=async()=>{const f=dsFid().gv;try{await kiemFid(f.id);$("#gvpin").value=f.ma;$("#gvgo").click()}catch(e){$("#gvmsg").innerHTML=`<div class="err">Chưa mở khoá được: ${loiFid(e)}. Cô nhập mã nhé.</div>`}};
 }
+
+/* ══════════ DI CHUỘT VÀO MÃ HIỆN TÊN: chỉ trang của cô, tên lấy từ trang "Nguồn tên" bằng mã giáo viên, chỉ giữ trong lúc mở trang (không lưu máy, không in, không xuất) ══════════ */
+let TEN_LOP={},TEN_DANG={};
+function layTen(lop){
+  if(TEN_LOP[lop])return Promise.resolve(TEN_LOP[lop]);
+  if(TEN_DANG[lop])return TEN_DANG[lop];
+  return TEN_DANG[lop]=fetch(SHEET+"?a=ten&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(lop)).then(r=>r.json()).then(d=>{delete TEN_DANG[lop];if(!d.ok)throw new Error(d.loi);return TEN_LOP[lop]=d.ten},e=>{delete TEN_DANG[lop];throw e});
+}
+function anTen(){const h=$("#tenNoi");if(h)h.remove()}
+function hienTen(el,x,y){
+  const ma=el.dataset.ma,lop=ma.split("-")[0];anTen();
+  const h=document.createElement("div");h.id="tenNoi";h.className="noprint";h.setAttribute("role","status");document.body.appendChild(h);
+  const dat=t=>{if(!$("#tenNoi")||h.dataset.ma!==ma)return;h.textContent=t;const r=el.getBoundingClientRect(),w=h.offsetWidth;h.style.left=Math.max(6,Math.min(innerWidth-w-6,r.left+r.width/2-w/2))+"px";h.style.top=(r.top>44?r.top-h.offsetHeight-6:r.bottom+6)+"px"};
+  h.dataset.ma=ma;
+  if(TEN_LOP[lop])return dat(`${ma}: ${TEN_LOP[lop][ma]||"chưa có tên trên trang Nguồn tên"}`);
+  dat(`${ma}: đang lấy tên…`);
+  layTen(lop).then(t=>dat(`${ma}: ${t[ma]||"chưa có tên trên trang Nguồn tên"}`)).catch(()=>dat(`${ma}: chưa lấy được tên, cần có mạng và Apps Script mới`));
+}
+const duocXemTen=()=>GVOK&&!GVQL&&coSheet();
+document.addEventListener("mouseover",e=>{const el=e.target.closest&&e.target.closest("[data-ma]");if(el&&duocXemTen())hienTen(el)});
+document.addEventListener("mouseout",e=>{const el=e.target.closest&&e.target.closest("[data-ma]");if(el&&!(e.relatedTarget&&el.contains(e.relatedTarget)))anTen()});
+document.addEventListener("click",e=>{const el=e.target.closest&&e.target.closest("[data-ma]");if(el&&duocXemTen()){hienTen(el);clearTimeout(window.__tenT);window.__tenT=setTimeout(anTen,6000)}});
 
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */
