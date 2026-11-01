@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261101-2314"</script>
+<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261101-2336"</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3ETin%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -1955,7 +1955,9 @@ function ganFidHS(){
   const b=$("#fidbat");if(b)b.onclick=async()=>{try{const id=await taoFid(U.code),d=dsFid();d.hs[U.code]={id};ghiFid(d);toast("🔐 Đã bật");render()}catch(e){$("#fidmsg").innerHTML=`<div class="err">Chưa bật được: ${loiFid(e)}.</div>`}};
   const t=$("#fidtat");if(t)t.onclick=()=>{const d=dsFid();delete d.hs[U.code];ghiFid(d);toast("Đã tắt. Em vẫn vào được bằng mã và PIN");render()};
 }
+function nutMoRieng(goi,ai){return TRONG_KHUNG&&TRANG_APP?`<a class="btn gold" style="display:block;text-align:center;text-decoration:none" href="${esc(TRANG_APP+goi)}" target="_blank" rel="noopener">🔐 Đăng nhập bằng khuôn mặt, vân tay</a><div class="small muted" style="margin:6px 0 0">App mở ở cửa sổ riêng, vì Google Sites không cho quét trong khung này. Lần đầu ${ai} đăng nhập bằng mã rồi bật ở ${ai==="cô"?"tab 🔐 Đăng nhập nhanh":"mục Tài khoản"}.</div>`:""}
 function nutFidVao(){
+  if(TRONG_KHUNG){const n=nutMoRieng("","em");return n?`<div class="card">${n}</div>`:""}
   if(!coTheFid())return "";
   const ds=Object.keys(dsFid().hs).filter(m=>MEM.users[m]&&/^11/.test(m));
   return ds.length?`<div class="card">${ds.map(m=>`<button class="btn" data-fidvao="${esc(m)}">🔐 Vào bằng khuôn mặt, vân tay · ${esc(m)}</button>`).join("")}<div id="fidmsg"></div></div>`:"";
@@ -1974,7 +1976,7 @@ function bindFidGV(){
   const b=$("#fgbat");if(b)b.onclick=async()=>{try{const id=await taoFid("Giáo viên"),d=dsFid();d.gv={id,ma:GVPIN};ghiFid(d);toast("🔐 Đã bật");render()}catch(e){$("#fgmsg").innerHTML=`<div class="err">Chưa bật được: ${loiFid(e)}.</div>`}};
   const t=$("#fgtat");if(t)t.onclick=()=>{const d=dsFid();delete d.gv;ghiFid(d);toast("Đã tắt. Cô vẫn vào được bằng mã");render()};
 }
-function nutFidGV(){return coTheFid()&&dsFid().gv?`<button class="btn gold" id="fgvao">🔐 Vào bằng khuôn mặt, vân tay</button>`:""}
+function nutFidGV(){if(TRONG_KHUNG)return nutMoRieng("?vai=gv","cô");return coTheFid()&&dsFid().gv?`<button class="btn gold" id="fgvao">🔐 Vào bằng khuôn mặt, vân tay</button>`:""}
 function ganFidGVVao(){
   const b=$("#fgvao");if(b)b.onclick=async()=>{const f=dsFid().gv;try{await kiemFid(f.id);$("#gvpin").value=f.ma;$("#gvgo").click()}catch(e){$("#gvmsg").innerHTML=`<div class="err">Chưa mở khoá được: ${loiFid(e)}. Cô nhập mã nhé.</div>`}};
 }
@@ -2006,7 +2008,7 @@ function hoiBanMoi(){
   if(!window.BAN_APP||navigator.onLine===false)return Promise.resolve(null);
   return fetch("sw.js?t="+Date.now(),{cache:"no-store"}).then(r=>r.text()).then(t=>{const m=t.match(/const BAN = "([^"]+)"/);return m&&m[1]!==window.BAN_APP&&!location.search.includes("v="+m[1])?m[1]:null}).catch(()=>null);
 }
-const moiBan=b=>location.replace(location.pathname+"?v="+encodeURIComponent(b));
+const moiBan=b=>location.replace(location.pathname+"?v="+encodeURIComponent(b)+(new URLSearchParams(location.search).get("vai")==="gv"?"&vai=gv":""));
 function baoBanMoi(b){
   if($("#banmoi"))return;
   const n=document.createElement("button");n.id="banmoi";n.className="noprint";n.textContent="🆕 Có bản mới · bấm để cập nhật";
@@ -2164,8 +2166,10 @@ function luuAnhCN(cv, ten){
 /* ══════════ KHỞI ĐỘNG ══════════ */
 loadStore();
 try{const t=localStorage.getItem(KEY+"_theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
+const vaoGV=new URLSearchParams(location.search).get("vai")==="gv";
 // bản chỉ còn Tin 11: tài khoản lớp 10, 12 cũ trên máy không tự vào nữa
-if(MEM.last&&MEM.users[MEM.last]&&MEM.users[MEM.last].g==="11"&&!(coTheFid()&&dsFid().hs[MEM.last]))U=MEM.users[MEM.last];   // đã bật khuôn mặt, vân tay thì quét mới vào
+if(MEM.last&&MEM.users[MEM.last]&&MEM.users[MEM.last].g==="11"&&!vaoGV&&!(coTheFid()&&dsFid().hs[MEM.last]))U=MEM.users[MEM.last];   // đã bật khuôn mặt, vân tay thì quét mới vào
+if(vaoGV)VIEW="gv";
 render();
 if(U&&U.canGui){baoGui("cho");setTimeout(guiNgay,1500)}
 // lấy sổ điểm nền (để hiện phiếu khảo sát, vinh danh mới) — tối đa 1 lần/giờ; quay lại app sau khi làm phiếu thì kiểm lại
