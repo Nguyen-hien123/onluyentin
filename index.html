@@ -1059,7 +1059,7 @@ function viewGV(){
   if(GVTAB==="gviec")b=viewGiaoViec();
   if(GVTAB==="dh")b=viewDongHoGV();
   if(GVTAB==="tru")b=viewTruDiem();
-  if(GVTAB==="so")b=`<div class="card">${coSheet()?`<div class="small muted">Link sổ điểm Google Sheet đã gắn vào app:</div><div class="code" style="word-break:break-all">${esc(SHEET)}</div><button class="btn" id="sogv">☁️ Lấy tổng hợp từ Google Sheet</button>`:`<div class="err">App chưa gắn link sổ điểm. Cô làm theo tệp “Huong dan so diem Google Sheet”, rồi chạy “DAT LINK GOOGLE SHEET.bat”.</div>`}<div id="somsg"></div></div><div id="soout">${GV_SO}</div>
+  if(GVTAB==="so")b=`<div class="card">${coSheet()?`<div class="small muted">Link sổ điểm Google Sheet đã gắn vào app:</div><div class="code" style="word-break:break-all">${esc(SHEET)}</div><label for="solop">Lớp</label><select id="solop">${lopGV().map(l=>`<option ${l===GV_SOLOP?"selected":""}>${esc(l)}</option>`).join("")}</select><button class="btn" id="sogv">☁️ Lấy học sinh lớp này từ Google Sheet</button>`:`<div class="err">App chưa gắn link sổ điểm. Cô làm theo tệp “Huong dan so diem Google Sheet”, rồi chạy “DAT LINK GOOGLE SHEET.bat”.</div>`}<div id="somsg"></div></div><div id="soout">${GV_SO}</div>
    <div class="card small"><b>Cô làm trên Google Sheet</b><br>• Trang <b>Điểm</b>: cột A là mã HS (VD 11A3-05), các cột sau cô tự đặt tên (TX1, Giữa kỳ, Nhận xét…). Học sinh xem ở mục 📊 Điểm, cần đúng mã + PIN.<br>• Menu <b>Ôn luyện Tin → 🏅 Lập vinh danh</b>: Sheet chọn tối đa 3 em mỗi lớp cho 3 danh hiệu (Ngôi sao ôn luyện, Nhà chinh phục, Thủ khoa luyện đề). Cô gõ <b>x</b> ở cột “Công bố” thì học sinh mới thấy và tải giấy chứng nhận.<br>• Không ghi họ tên học sinh lên Sheet.</div>
    <div class="card"><b>Xem thử giấy chứng nhận</b><div class="small muted">Dữ liệu mẫu, không lưu.</div>${Object.keys(NHOM_CN).filter(k=>k!=="khac").map((k,i)=>`<button class="btn ghost" data-cnmau="${i}">${esc(k)}</button>`).join("")}</div>`;
   if(GVTAB==="bc")b=`<div class="card"><div class="small muted">Dán các mã báo cáo học sinh gửi (mỗi mã một dòng, dán lẫn chữ khác cũng được).</div><textarea id="bcin" placeholder="BC~11A3-05~...">${esc(GV_BC||"")}</textarea><button class="btn" id="bcgo">Đọc báo cáo</button></div><div id="bcout"></div>`;
@@ -1067,6 +1067,11 @@ function viewGV(){
    <div class="card small"><b>Thống kê ngân hàng câu hỏi Tin 11</b><br>${(bs=>`${bs.length} bài · ${bs.reduce((s,b)=>s+(b.td||[]).length,0)} câu Cổng, Thách đấu (50 câu mỗi bài) · ${bs.filter(b=>b.db).length} gói đặc biệt (12 câu mỗi gói, lấy từ ngân hàng trên) · ${bs.reduce((s,b)=>s+b.mcq.length,0)} câu Luyện tập · ${bs.reduce((s,b)=>s+b.tf.length,0)} câu Đúng/Sai · ${bs.reduce((s,b)=>s+b.the.length,0)} thẻ nhớ`)(DATA["11"].bai)}</div>`;
   return `<div class="top noprint"><button class="back" id="gvout">←</button><h1>Trang giáo viên</h1></div>
   <div class="ltabs gvtabs noprint">${tabs.map(t=>`<button data-gt="${t[0]}" class="${GVTAB===t[0]?"on":""}">${t[1]}</button>`).join("")}</div><div class="wrap">${b}</div>`;
+}
+let GV_SOLOP="",GV_SODS=null,GV_SOTH="";
+function veSoLop(){
+  const ds=(GV_SODS||[]).filter(r=>r.ma.split("-")[0]===GV_SOLOP).sort((a,b)=>a.ma.localeCompare(b.ma,"vi",{numeric:true}));
+  return ds.length?`<div class="card"><div class="small muted" style="margin-bottom:6px">Lớp ${esc(GV_SOLOP)}: ${ds.length} học sinh · “Tháng này” = điểm thưởng ${tenThang(GV_SOTH)}</div><table><tr><th>Mã HS</th><th>Điểm thưởng</th><th>Tháng này</th><th>Bài ★★</th><th>Chặng</th><th>Đề KT</th><th>Gửi lúc</th></tr>${ds.map(r=>`<tr><td><b>${esc(r.ma)}</b></td><td>${r.tong}</td><td>${r.thD}</td><td>${r.bai2}</td><td>${r.chang}</td><td>${so(r.deKT)}</td><td class="small">${esc(String(r.luc).slice(0,16))}</td></tr>`).join("")}</table></div>`:`<div class="card small muted">Lớp ${esc(GV_SOLOP)} chưa có học sinh nào gửi tiến độ.</div>`;
 }
 let GV_LOP="",GV_SI=40,GV_BC="",GV_SO="",GVPIN="";
 function pinSlips(){
@@ -1114,12 +1119,13 @@ function bindGV(){
     const c=$("#csv");if(c)c.onclick=()=>{const lines=[["Ma HS","Diem thuong","Bai dat 2 sao tro len","Tong sao","Chang da vuot","Diem de KT tot nhat","Ngay gui","Ma hop le"].join(",")].concat(rows.map(r=>{const st=r.st.split("").map(Number);return [r.code,r.pts,st.filter(x=>x>=2).length,st.reduce((a,b)=>a+b,0),r.bo.split("").filter(x=>x==="1").length,String(r.chuan).replace(".",","),r.day,r.ok?"co":"KHONG"].map(v=>`"${v}"`).join(",")}));
       const blob=new Blob(["﻿"+lines.join("\r\n")],{type:"text/csv;charset=utf-8"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="bao-cao-on-luyen-tin.csv";document.body.appendChild(a);a.click();a.remove()}};
   if(GVTAB==="td")bindTheoDoi();
+  const sl=$("#solop");if(sl){GV_SOLOP=sl.value;sl.onchange=()=>{GV_SOLOP=sl.value;if(GV_SODS){GV_SO=veSoLop();$("#soout").innerHTML=GV_SO}}}
   const sg=$("#sogv");if(sg)sg.onclick=()=>{sg.disabled=true;sg.textContent="⏳ Đang lấy…";
     fetch(SHEET+"?a=gv&gv="+encodeURIComponent(GVPIN)).then(r=>r.json()).then(d=>{if(!d.ok)throw new Error(d.loi);
-      const ds=d.ds.sort((a,b)=>a.ma.localeCompare(b.ma,"vi",{numeric:true}));
-      GV_SO=ds.length?`<div class="card" style="overflow-x:auto"><div class="small muted" style="margin-bottom:6px">${ds.length} học sinh · “Tháng này” = điểm thưởng ${tenThang(d.th)}</div><table><tr><th>Mã HS</th><th>Điểm thưởng</th><th>Tháng này</th><th>Bài ★★</th><th>Chặng</th><th>Đề KT</th><th>Gửi lúc</th></tr>${ds.map(r=>`<tr><td><b>${esc(r.ma)}</b></td><td>${r.tong}</td><td>${r.thD}</td><td>${r.bai2}</td><td>${r.chang}</td><td>${so(r.deKT)}</td><td class="small">${esc(String(r.luc).slice(0,16))}</td></tr>`).join("")}</table></div>`:`<div class="card small muted">Sheet chưa có học sinh nào gửi tiến độ.</div>`;
+      GV_SODS=d.ds;GV_SOTH=d.th;
+      GV_SO=veSoLop();
       $("#soout").innerHTML=GV_SO;sg.disabled=false;sg.textContent="☁️ Lấy lại";})
-      .catch(e=>{sg.disabled=false;sg.textContent="☁️ Lấy tổng hợp từ Google Sheet";$("#somsg").innerHTML=`<div class="err">${esc(e.message||"Chưa lấy được.")}</div>`})};
+      .catch(e=>{sg.disabled=false;sg.textContent="☁️ Lấy học sinh lớp này từ Google Sheet";$("#somsg").innerHTML=`<div class="err">${esc(e.message||"Chưa lấy được.")}</div>`})};
   document.querySelectorAll("[data-cnmau]").forEach(b=>b.onclick=()=>{const k=Object.keys(NHOM_CN)[+b.dataset.cnmau];VIEW={t:"cn",gv:1,from:"gvhome",o:{th:ym(),lop:"11A3",ma:"11A3-05",danh:k,hang:+b.dataset.cnmau+1,gt:["1240 điểm thưởng","9 bài mới đạt ★★","9,5 điểm đề kiểm tra"][+b.dataset.cnmau]}};render()});
   document.querySelectorAll("[data-xem]").forEach(b=>b.onclick=()=>{const g=b.dataset.xem;const code="GV-XEM-"+g;if(!MEM.users[code])MEM.users[code]=newUser(code,g);U=MEM.users[code];U.xem=1;VIEW=null;TAB="map";render()});
 }
@@ -1573,10 +1579,10 @@ function ganXepHang(){
 
 /* ── Trang giáo viên: Phân tích lớp · Mảnh ghép, bể cá · Giao việc */
 let MG_VANG=[],MG_NHOM=[],MG_TRONG=[];
-let GVQL=null,PT_LOP="",PT_BAI=1,PT_D=null,MG_KQ="",GV_TIN="";
+let GVQL=null,PT_LOP="",PT_BAI=0,PT_D=null,MG_KQ="",GV_TIN="";
 const lopGV=()=>Object.keys(LOP_CO).filter(l=>!GVQL||GVQL.includes(l)).sort();
 const chonLopBai=(idL,idB,lop,bai)=>`<div class="row"><div><label for="${idL}" style="margin-top:0">Lớp</label><select id="${idL}">${lopGV().map(l=>`<option ${l===lop?"selected":""}>${esc(l)}</option>`).join("")}</select></div>
-  <div><label for="${idB}" style="margin-top:0">Bài</label><select id="${idB}">${DATA["11"].bai.map(b=>`<option value="${b.so}" ${b.so===bai?"selected":""}>Bài ${b.so}</option>`).join("")}</select></div></div>`;
+  <div style="flex:3;min-width:0"><label for="${idB}" style="margin-top:0">Bài</label><select id="${idB}" style="width:100%"><option value="" ${bai?"":"selected"}>— Cô chọn bài —</option>${DATA["11"].bai.map(b=>`<option value="${b.so}" ${b.so===bai?"selected":""}>Bài ${b.so}. ${esc(b.ten)}</option>`).join("")}</select></div></div>`;
 function layLopBai(){return fetch(SHEET+"?a=gvlop&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(PT_LOP)+"&bai="+PT_BAI).then(r=>r.json()).then(d=>{if(!d.ok)throw new Error(d.loi);return d})}
 function viewPhanTich(){
   PT_LOP=PT_LOP||lopGV()[0]||"";const b=baiOf("11",PT_BAI);
@@ -1597,7 +1603,7 @@ function viewPhanTich(){
 function bindPhanTich(){
   const l=$("#ptlop"),bb=$("#ptbai"),t=$("#pttai");if(!t)return;
   l.onchange=()=>{PT_LOP=l.value;PT_D=null;render()};bb.onchange=()=>{PT_BAI=+bb.value;PT_D=null;render()};
-  t.onclick=()=>{t.disabled=true;t.textContent="⏳ Đang lấy…";layLopBai().then(d=>{PT_D=d;render()}).catch(e=>{t.disabled=false;t.textContent="🔄 Lấy kết quả từ Google Sheet";$("#ptgvmsg").innerHTML=`<div class="err">${esc(e.message||"Chưa lấy được.")}</div>`})};
+  t.onclick=()=>{if(!PT_BAI){$("#ptgvmsg").innerHTML='<div class="err">Cô chọn bài trước nhé.</div>';return}t.disabled=true;t.textContent="⏳ Đang lấy…";layLopBai().then(d=>{PT_D=d;render()}).catch(e=>{t.disabled=false;t.textContent="🔄 Lấy kết quả từ Google Sheet";$("#ptgvmsg").innerHTML=`<div class="err">${esc(e.message||"Chưa lấy được.")}</div>`})};
   const c=$("#ptchep");if(c)c.onclick=()=>{(navigator.clipboard?navigator.clipboard.writeText(PT_D.loiNhac):Promise.reject()).then(()=>toast("Đã chép ✓"),()=>toast("Máy chưa cho sao chép"))};
 }
 // 4 tổ theo số thứ tự; mỗi nhóm mảnh ghép đủ thành viên của 4 tổ; bể cá: 3 bạn đã sẵn sàng + 3 bạn còn băn khoăn
@@ -1607,7 +1613,7 @@ function viewManhGhep(){
   PT_LOP=PT_LOP||lopGV()[0]||"";
   return `<div class="card noprint">${chonLopBai("mglop","mgbai",PT_LOP,PT_BAI)}
    <div class="row"><div><label for="mgso">Số nhóm mảnh ghép</label><input id="mgso" type="tel" value="${Math.max(2,Math.floor((LOP_CO[PT_LOP]||40)/4/2))}"></div><div><label for="mgvang">STT vắng (cách nhau dấu phẩy)</label><input id="mgvang" type="text" placeholder="VD: 3, 17"></div></div>
-   <button class="btn" id="mgchia">👥 Chia tổ, nhóm, bể cá</button><div id="mgmsg"></div><div class="small muted" style="margin-top:6px">Có mạng thì app lấy kết quả Cổng từ Sheet để gắn ★ cho em đã sẵn sàng. Chỉ hiện STT và quân bài, không có họ tên.</div></div><div id="mgkq">${MG_KQ}</div>
+   <button class="btn" id="mgchia">👥 Chia tổ, nhóm, bể cá</button><div id="mgmsg"></div><div class="small muted" style="margin-top:6px">Chọn bài và có mạng thì app lấy kết quả Cổng từ Sheet để gắn ★ cho em đã sẵn sàng; chưa chọn bài thì chia theo số thứ tự. Chỉ hiện STT và quân bài, không có họ tên.</div></div><div id="mgkq">${MG_KQ}</div>
    <div class="card small"><b>🐟 Quy trình bể cá</b><ol style="margin:6px 0 0;padding-left:20px"><li>Vào bể (2'): 6 bạn vòng trong, các bạn còn lại vòng ngoài cầm phiếu.</li><li>Mở bể (1'): đọc câu hỏi lấy từ câu lớp sai nhiều nhất, nêu ý đầu tiên.</li><li>Thảo luận (6–7'): cầm "micro" mới nói, mỗi lượt không quá 1 phút, mỗi ý kèm dẫn chứng SGK.</li><li>Vòng ngoài ghi ý hay, đánh dấu ✓ ✗ ?, chuẩn bị câu hỏi.</li><li>"Thả câu" (3–4'): 3 bạn đọc câu hỏi, gọi số cá trả lời.</li><li>Bình chọn và tổng kết (3'): cô chốt kiến thức đúng và chỗ hay nhầm.</li></ol>Luật vàng: phản biện ý, không phản biện người.</div>
    <button class="btn ghost noprint" onclick="print()">🖨️ In</button>`;
 }
@@ -1633,7 +1639,7 @@ function bindManhGhep(){
     $("#mgkq").innerHTML=MG_KQ;
     const q=$("#mgquay");q.onclick=()=>{const i=chonNN(coMat,1)[0];$("#mggoi").textContent=`${i} · ${quanBai(PT_LOP+"-"+i)}`};
   };
-  t.onclick=()=>{if(navigator.onLine===false||!coSheet())return chia();t.disabled=true;layLopBai().then(d=>{PT_D=d;t.disabled=false;chia()}).catch(()=>{t.disabled=false;$("#mgmsg").innerHTML='<div class="err">Chưa lấy được Sheet, em chia theo số thứ tự, chưa gắn ★.</div>';chia()})};
+  t.onclick=()=>{if(navigator.onLine===false||!coSheet()||!PT_BAI)return chia();t.disabled=true;layLopBai().then(d=>{PT_D=d;t.disabled=false;chia()}).catch(()=>{t.disabled=false;$("#mgmsg").innerHTML='<div class="err">Chưa lấy được Sheet, em chia theo số thứ tự, chưa gắn ★.</div>';chia()})};
 }
 function viewGiaoViec(){
   PT_LOP=PT_LOP||lopGV()[0]||"";
@@ -1643,7 +1649,7 @@ function viewGiaoViec(){
 function bindGiaoViec(){
   const l=$("#gvlop"),bb=$("#gvbai"),t=$("#gvtao");if(!t)return;
   l.onchange=()=>{PT_LOP=l.value};bb.onchange=()=>{PT_BAI=+bb.value};
-  t.onclick=()=>{const b=baiOf("11",PT_BAI),h=$("#gvhan").value.trim();
+  t.onclick=()=>{if(!PT_BAI)return toast("Cô chọn bài trước nhé");const b=baiOf("11",PT_BAI),h=$("#gvhan").value.trim();
     GV_TIN=`Lớp ${PT_LOP} thân mến,\nCác em vào app Chinh phục Tin học 11: ${TRANG_APP}\nBài ${b.so}. ${b.ten} (SGK trang ${b.trang})\n1. Đọc Trọng tâm, ôn Sơ đồ, Luyện tập.\n2. Vượt Cổng ${NGUONG}/10 — mã mở Cổng: ${maCong(b.so)}\n3. Câu sai: bấm Hỏi AI đúng cách, rồi làm lượt mới.\n4. Viết Phản tư để nhận tem hộ chiếu.\n${h?"Hạn: "+h+"\n":""}Kết quả tự gửi về cô, các em nhìn thấy dòng "Cô đã nhận kết quả" là xong.`;render()};
   const c=$("#gvchep");if(c)c.onclick=()=>{(navigator.clipboard?navigator.clipboard.writeText(GV_TIN):Promise.reject()).then(()=>toast("Đã chép ✓"),()=>toast("Máy chưa cho sao chép"))};
 }
@@ -1720,7 +1726,7 @@ function chuongVaoLop(){   // chuông điện trường học: búa gõ 22 lần
 }
 const DH = { tong: 5 * 60000, con: 5 * 60000, het: 0, chay: false, dem: null };
 const mmss = ms => { const s = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); };
-function capNhatDH(){ const e = $("#dhLB"); if (e) e.textContent = PT_LOP ? "📍 " + PT_LOP + " · Bài " + PT_BAI : "⏰ Đồng hồ"; }
+function capNhatDH(){ const e = $("#dhLB"); if (e) e.textContent = PT_LOP ? "📍 " + PT_LOP + (PT_BAI ? " · Bài " + PT_BAI : "") : "⏰ Đồng hồ"; }
 // nhạc nền yên tĩnh khi các em làm nhiệm vụ: app tự tạo tiếng (không dùng bản nhạc có bản quyền, không cần mạng), hoà âm chậm + vài nốt thưa
 const NHAC_HOA = [[130.81, 196, 246.94, 329.63], [110, 164.81, 261.63, 329.63], [87.31, 174.61, 220, 329.63], [98, 146.83, 220, 293.66]], NHAC_NOT = [523.25, 587.33, 659.25, 783.99, 880];
 let nhacChay = null;
