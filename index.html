@@ -260,48 +260,63 @@ select,input,textarea{max-width:100%}
   .bang-td th:last-child,.bang-td td:last-child{display:none}
 }
 
-/* ══════════ CHỦ ĐỀ "CHINH PHỤC": núi lúc bình minh ══════════ */
-:root{--brand:#4f46e5;--brand-2:#db2777;--brand-soft:#ece9fe;--bg:#f3f1fb;--line:#e2def3;--ink:#1f1b3a;--muted:#5f5a7d;--gold:#f59e0b}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--brand:#a5b4fc;--brand-2:#f9a8d4;--brand-soft:#2a2660;--bg:#1b1838;--card:#231f47;--line:#3a3566;--ink:#f1effb;--muted:#b6b1d6}}
-:root[data-theme="dark"]{--brand:#a5b4fc;--brand-2:#f9a8d4;--brand-soft:#2a2660;--bg:#1b1838;--card:#231f47;--line:#3a3566;--ink:#f1effb;--muted:#b6b1d6}
-html{background:#1e1b4b}
-body{background:linear-gradient(175deg,#1e1b4b 0%,#4c1d95 32%,#be185d 66%,#f97316 100%) fixed}
-body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:46vh;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 500' preserveAspectRatio='none'%3E%3Cpath fill='%23312e81' fill-opacity='.55' d='M0 400 240 180 400 300 640 70 860 300 1040 170 1440 420V500H0Z'/%3E%3Cpath fill='%231e1b4b' fill-opacity='.85' d='M0 460 300 280 520 410 780 220 1040 420 1240 320 1440 450V500H0Z'/%3E%3C/svg%3E") center bottom/100% 100% no-repeat;pointer-events:none;z-index:-1}
-body{position:relative;z-index:0}
-.top{background:linear-gradient(90deg,rgba(30,27,75,.92),rgba(190,24,93,.86));color:#fff!important;backdrop-filter:blur(6px)}
-.card{box-shadow:0 8px 28px rgba(30,27,75,.28)}
-.hero{color:#fff;padding-top:36px}
-.hero .muted{color:#fde9f3}
-.hero h2{font-weight:900;letter-spacing:.2px;text-shadow:0 2px 14px rgba(0,0,0,.35)}
-.khauhieu{font-size:17px;font-weight:600;color:#fff;margin-top:8px;text-shadow:0 1px 8px rgba(0,0,0,.4)}
-.logo{background:linear-gradient(145deg,#f97316,#db2777 55%,#4f46e5);box-shadow:0 10px 30px rgba(0,0,0,.35);width:92px;height:92px;border-radius:26px}
+/* ══════════ CHỦ ĐỀ "CHINH PHỤC": bình minh sáng, chữ đậm, dễ đọc ══════════ */
+:root{--brand:#3730a3;--brand-2:#be185d;--brand-soft:#e0e7ff;--bg:#eef2ff;--card:#ffffff;--line:#c7d2fe;--ink:#111033;--muted:#46436a;--gold:#b45309;--gold-soft:#fef3c7}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--brand:#c7d2fe;--brand-2:#fbcfe8;--brand-soft:#312e81;--bg:#1e1b4b;--card:#1b1a3d;--line:#4338ca;--ink:#f8f8ff;--muted:#d4d3ee;--gold:#fcd34d;--gold-soft:#422006}}
+:root[data-theme="dark"]{--brand:#c7d2fe;--brand-2:#fbcfe8;--brand-soft:#312e81;--bg:#1e1b4b;--card:#1b1a3d;--line:#4338ca;--ink:#f8f8ff;--muted:#d4d3ee;--gold:#fcd34d;--gold-soft:#422006}
+html{background:#eef2ff}
+body{position:relative;z-index:0;background:linear-gradient(180deg,#e0e7ff 0%,#fce7f3 58%,#ffedd5 100%) fixed;color:var(--ink)}
+body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:40vh;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 500' preserveAspectRatio='none'%3E%3Cpath fill='%23c7d2fe' fill-opacity='.45' d='M0 400 240 180 400 300 640 70 860 300 1040 170 1440 420V500H0Z'/%3E%3Cpath fill='%23a5b4fc' fill-opacity='.4' d='M0 460 300 280 520 410 780 220 1040 420 1240 320 1440 450V500H0Z'/%3E%3C/svg%3E") center bottom/100% 100% no-repeat;pointer-events:none;z-index:-1}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) body{background:#12112e}:root:not([data-theme="light"]) html{background:#12112e}:root:not([data-theme="light"]) body::before{opacity:.18}}
+:root[data-theme="dark"] body{background:#12112e}:root[data-theme="dark"]{background:#12112e}:root[data-theme="dark"] body::before{opacity:.18}
+.top{background:#312e81;color:#fff!important}
+.pts{background:rgba(255,255,255,.18);color:#fff}
+.card{box-shadow:0 4px 16px rgba(49,46,129,.14);color:var(--ink)}
+.hero{color:var(--ink);padding-top:32px}
+.hero .muted{color:var(--muted)}
+.hero h2{font-weight:900;color:var(--brand)}
+.khauhieu{font-size:17px;font-weight:600;color:var(--ink);margin-top:8px}
+.logo{background:linear-gradient(145deg,#ea580c,#be185d 55%,#3730a3);box-shadow:0 8px 22px rgba(49,46,129,.3);width:92px;height:92px;border-radius:26px}
 .logo svg{width:66px;height:66px}
-.btn{background:linear-gradient(95deg,#4f46e5,#7c3aed 55%,#db2777);color:#fff!important}
-.btn.ghost{background:var(--brand-soft);color:var(--brand)!important}
-.btn.gold{background:linear-gradient(95deg,#f59e0b,#f97316);color:#2b1600!important}
+.btn{background:#3730a3;color:#fff!important}
+.btn.ghost{background:#e0e7ff;color:#312e81!important;border:1px solid #a5b4fc}
+.btn.gold{background:#f59e0b!important;color:#1c1000!important}
 .ltabs{background:transparent}
-.ltabs button{background:rgba(255,255,255,.94);color:#1f1b3a;border-color:transparent}
-.ltabs button.on{background:linear-gradient(95deg,#f59e0b,#f97316);color:#2b1600!important}
-.ltabs .tick{color:#16a34a}
-.sec-t{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.45)}
-.wrap>.small,.wrap>.muted,.wrap>.small.muted,.wrap>div>.small.muted:only-child{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.5)}
-.link{color:#fff}
-.bar i{background:linear-gradient(90deg,#f59e0b,#db2777,#7c3aed)}
-.tabbar{background:rgba(255,255,255,.97)}
-.tabbar button{color:#5f5a7d}
-.tabbar button.on{color:#be185d}
-.lvl{background:linear-gradient(120deg,rgba(79,70,229,.10),rgba(219,39,119,.10),rgba(249,115,22,.12)),var(--card)}
-.chang.locked{opacity:.86}
-.thevuot{background:linear-gradient(120deg,#312e81,#7c3aed 55%,#db2777);color:#fff}
-.thevuot .small{color:#f5ebff}
-.thevuot .bar{background:rgba(255,255,255,.25)}
-.thevuot .so{font-size:30px;font-weight:900;line-height:1.1}
-.ghinhan{background:linear-gradient(135deg,#312e81,#7c3aed 55%,#db2777);color:#fff}
-.ghinhan .nhan{font-weight:700;letter-spacing:.6px;font-size:13px;color:#fde9f3}
-.ghinhan .loi{font-size:20px;font-weight:700;line-height:1.5;margin:10px 0}
-.ghinhan .vuot{background:rgba(255,255,255,.16);border-radius:12px;padding:10px 12px;font-weight:600}
-.ghinhan .ky{color:#fde9f3;margin-top:8px}
+.ltabs button{background:var(--card);color:var(--ink);border:2px solid var(--line)}
+.ltabs button.on{background:#3730a3;border-color:#3730a3;color:#fff!important}
+.ltabs .tick{color:#15803d}
+.ltabs button.on .tick{color:#fff}
+.sec-t{color:var(--ink);font-size:14px}
+.link{color:var(--brand);font-weight:600}
+.bar{background:var(--line)}
+.bar i{background:linear-gradient(90deg,#f59e0b,#be185d,#3730a3)}
+.tabbar{background:var(--card)}
+.tabbar button{color:var(--muted)}
+.tabbar button.on{color:var(--brand)}
+.chang.locked{opacity:1;background:var(--bg)}
+.thevuot,.ghinhan{background:#312e81;color:#fff}
+.thevuot b,.ghinhan b{color:#fff}
+.thevuot .small,.ghinhan .small{color:#fff}
+.thevuot .bar{background:rgba(255,255,255,.3)}
+.thevuot .so{font-size:30px;font-weight:900;line-height:1.1;color:#fde68a}
+.ghinhan .nhan{font-weight:700;letter-spacing:.6px;font-size:13px;color:#fde68a}
+.ghinhan .loi{font-size:20px;font-weight:700;line-height:1.5;margin:10px 0;color:#fff}
+.ghinhan .vuot{background:rgba(255,255,255,.14);border-radius:12px;padding:10px 12px;font-weight:600;color:#fff}
+.ghinhan .ky{color:#fff;margin-top:8px}
 @media print{body{background:#fff}body::before{display:none}}
+
+.thanhxem{position:sticky;top:0;z-index:7;display:flex;gap:10px;align-items:center;justify-content:space-between;background:#fde68a;color:#3b2600;padding:8px 14px;font-weight:700}
+.thanhxem button{border:0;border-radius:10px;background:#1e1b4b;color:#fff;padding:8px 12px;font-weight:700}
+.nutdau{display:block;margin:6px auto 18px;border:0;border-radius:999px;padding:10px 20px;font-weight:700;background:rgba(255,255,255,.95);color:#1f1b3a;box-shadow:0 4px 14px rgba(0,0,0,.25)}
+.luoiqb{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:8px}
+.qb{position:relative;background:#fff;color:#111827;border:2px solid #cbd5e1;border-radius:10px;text-align:center;padding:3px 2px 6px;min-height:68px}
+.qb .stt{display:block;font-size:13px;font-weight:800;color:#fff;background:#475569;border-radius:6px;margin:0 4px 3px}
+.qb .la{display:block;font-size:20px;font-weight:800;line-height:1.2}
+.qb .roi{position:absolute;right:-5px;bottom:-6px;background:#dc2626;color:#fff;border-radius:999px;font-size:11px;font-weight:700;padding:1px 5px}
+.qb.qua{border-color:#16a34a;background:#dcfce7}.qb.qua .stt{background:#16a34a}
+.qb.dang{border-color:#f59e0b;background:#fef3c7}.qb.dang .stt{background:#d97706}
+.qb.chua{border-color:#94a3b8;background:#e2e8f0}
+@media print{.thanhxem,.nutdau{display:none}}
 </style>
 </head>
 <body>
@@ -422,9 +437,9 @@ function baoGui(tt,t){
 function congGon(){const C=U.cong||{},r={};Object.keys(C).forEach(k=>{r[k]=Object.assign({},C[k]);if(r[k].pt)r[k].pt={tt:r[k].pt.tt}});return r}
 function goiGui(){
   const g=U.g,all=DATA[g].bai.filter(b=>!b.cho),th=ym(),m=thangU(th);
-  const u=JSON.stringify({code:U.code,g,lp:U.lp,boss:U.boss,de:U.de,mo:U.mo,sai:U.sai.slice(-60),t0:U.t0,thang:U.thang,lastPts:U.lastPts,lastN2:U.lastN2,xp:U.xp,dbk:U.dbk,tdBest:U.tdBest,tdLuot:U.tdLuot,sanN:U.sanN,nhanN:U.nhanN,tuan:U.tuan,saiChon:U.saiChon,cong:congGon(),truDa:U.truDa,tbMoi:U.tbMoi});
+  const u=JSON.stringify({code:U.code,g,lp:U.lp,boss:U.boss,de:U.de,mo:U.mo,sai:U.sai.slice(-60),t0:U.t0,thang:U.thang,lastPts:U.lastPts,lastN2:U.lastN2,xp:U.xp,dbk:U.dbk,tdBest:U.tdBest,tdLuot:U.tdLuot,sanN:U.sanN,nhanN:U.nhanN,tuan:U.tuan,saiChon:U.saiChon,cong:congGon(),truDa:U.truDa,tbMoi:U.tbMoi,roi:U.roi});
   const d={ma:U.code,g,tong:totalPts(),bai2:n2Of(U),sao:all.reduce((s,b)=>s+((U.lp[b.so]||{}).st||0),0),
-    chang:Object.values(U.boss).filter(b=>b.pass).length,deKT:U.de.chuan||0,deN:U.de.nhanh||0,th,thD:m.d,thB:m.b,thDe:m.de,dbX:Object.keys(U.dbk||{}).length,tdL:U.tdLuot||0,tuanK:(U.tuan||{}).k||0,tuanD:(U.tuan||{}).d||0,tem:soTem(),ptN:soPT(),u};
+    chang:Object.values(U.boss).filter(b=>b.pass).length,deKT:U.de.chuan||0,deN:U.de.nhanh||0,th,thD:m.d,thB:m.b,thDe:m.de,dbX:Object.keys(U.dbk||{}).length,tdL:U.tdLuot||0,tuanK:(U.tuan||{}).k||0,tuanD:(U.tuan||{}).d||0,tem:soTem(),ptN:soPT(),roiN:(U.roi||{}).n||0,roiG:(U.roi||{}).g||0,u};
   d.ck=(h32(BIMAT+"|sync|"+[d.ma,d.tong,d.th,d.thD,d.thB,d.thDe].join("|"))%1679616).toString(36);
   return d;
 }
@@ -505,7 +520,8 @@ function openLessons(g){const out=[];chuongs(g).forEach((c,i)=>c.bai.forEach((b,
 
 /* ══════════ ĐIỀU HƯỚNG ══════════ */
 let TAB="map", VIEW=null;
-function render(){
+function render(){veTrang();veThem()}
+function veTrang(){
   const a=$("#app");
   if(!U){const gp=$("#guipill");if(gp)gp.remove()}
   if(!U&&VIEW!=="gv"&&VIEW!=="gvhome"&&!(VIEW&&VIEW.t==="cn")){a.innerHTML=viewLogin();bindLogin();return}
@@ -529,7 +545,7 @@ document.addEventListener("click",e=>{const b=e.target.closest("[data-back]");if
 function viewLogin(){
   const recent=Object.keys(MEM.users).filter(c=>/^11/.test(c)).slice(-4).reverse();
   return `<div class="hero"><div class="logo"><svg viewBox='0 0 64 64' aria-hidden='true'><path fill='#fff' d='M4 54 24 20l10 16 6-9 20 27Z'/><path fill='#fde68a' d='M24 20l-6 10 6-3 5 3 Z'/><path stroke='#fff' stroke-width='3' d='M40 27V8'/><path fill='#fde047' d='M40 8l13 5-13 5Z'/></svg></div><h2>Chinh phục Tin học 11</h2><div class="muted">${TRUONG}</div><div class="khauhieu">Đỉnh núi của em không ở đâu xa: đó là em của ngày hôm qua.</div></div>
-  <div class="wrap">${khungBao()}<div class="card">
+  <div class="wrap">${khungBao()}${nutFidVao()}<div class="card">
    <label for="lop">Lớp của em</label><input id="lop" type="text" placeholder="VD: 11A3" autocomplete="off" autocapitalize="characters">
    <label for="stt">Số thứ tự trong danh sách lớp</label><input id="stt" type="tel" inputmode="numeric" placeholder="VD: 5" maxlength="2">
    <label for="pin">Mã PIN cô phát (4 số)</label><input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••">
@@ -541,6 +557,7 @@ function viewLogin(){
   <div style="text-align:center"><button class="link" id="gvlink">Dành cho giáo viên</button></div></div>`;
 }
 function bindLogin(){
+  ganFidVao();
   document.querySelectorAll("[data-quick]").forEach(b=>b.onclick=()=>{const [l,s]=b.dataset.quick.split("-");$("#lop").value=l;$("#stt").value=parseInt(s,10);$("#pin").focus()});
   $("#gvlink").onclick=()=>{VIEW="gv";render()};
   $("#pin").addEventListener("keydown",e=>{if(e.key==="Enter")$("#go").click()});
@@ -1002,6 +1019,7 @@ function viewToi(){
   <div class="card"><h3 style="margin:0 0 6px">🔓 Nhập mã mở khoá</h3><div class="small muted">Cô sẽ đọc mã khi lớp đã học xong bài hoặc chặng trên lớp.</div>
    <input id="mamo" type="text" placeholder="VD: 3KX9P" autocapitalize="characters" style="margin-top:8px"><div id="momsg"></div><button class="btn ghost" id="nhapmo">Mở khoá</button></div>
   ${theCai(true)}
+  ${theFidHS()}
   <div class="card"><h3 style="margin:0 0 6px">🎨 Giao diện</h3><div class="row"><button class="btn ghost" data-th="light">☀️ Sáng</button><button class="btn ghost" data-th="dark">🌙 Tối</button><button class="btn ghost" data-th="">⚙️ Theo máy</button></div></div>
   <button class="btn ghost" id="logout">Đăng xuất</button>
   ${coSheet()?`<div class="card"><h3 style="margin:0 0 6px">☁️ Kết quả gửi tới ${GV}</h3><div class="small">${U.canGui?"⏳ Còn kết quả chờ gửi (có mạng app tự gửi).":U.toiCo&&U.toiCo>=(U.daGui||0)?"✅ Cô đã nhận kết quả của em lúc "+new Date(U.toiCo).toLocaleString("vi-VN")+".":U.daGui?"📤 Đã gửi lúc "+new Date(U.daGui).toLocaleString("vi-VN")+", đang chờ sổ xác nhận.":"Chưa gửi lần nào."}</div>
@@ -1013,6 +1031,7 @@ function viewToi(){
   <div class="small muted" style="margin-top:14px;text-align:center">App Chinh phục Tin học 11 · ${TRUONG}<br>Nội dung bám SGK Tin học 11 (Kết nối tri thức) · ${GV}</div>`;
 }
 function bindToi(){
+  ganFidHS();
   const gl=$("#guilai");if(gl)gl.onclick=()=>{U.canGui=1;guiNgay().then(ok=>{if(!ok)toast(navigator.onLine===false?"Máy đang mất mạng":"Chưa gửi được, em thử lại sau nhé")})};
   $("#luutep").onclick=()=>luuTep(new Blob([tepLuu()],{type:"application/json"}),`Ket qua On luyen Tin ${U.code} ${ym()}.json`,"Tệp lưu kết quả");
   $("#motep").onclick=()=>$("#teplu").click();
@@ -1036,9 +1055,10 @@ let GVOK=false, GVTAB="td";
 function viewGVLogin(){
   return `<div class="top"><button class="back" id="gvback">←</button><h1>Dành cho giáo viên</h1></div><div class="wrap"><div class="card">
   <label for="gvpin">Mã giáo viên hoặc mã Ban Giám hiệu (QL-…)</label><input id="gvpin" type="password" maxlength="12" autocapitalize="characters"><div id="gvmsg"></div>
-  <button class="btn" id="gvgo">Vào trang giáo viên</button></div><div class="small muted">Mã giáo viên ghi trong file hướng dẫn sử dụng của cô.</div></div>`;
+  <button class="btn" id="gvgo">Vào trang giáo viên</button>${nutFidGV()}</div><div class="small muted">Mã giáo viên ghi trong file hướng dẫn sử dụng của cô.</div></div>`;
 }
 function bindGVLogin(){
+  ganFidGVVao();
   $("#gvback").onclick=()=>{VIEW=null;render()};
   $("#gvpin").addEventListener("keydown",e=>{if(e.key==="Enter")$("#gvgo").click()});
   $("#gvgo").onclick=()=>{const v=$("#gvpin").value.trim();
@@ -1049,7 +1069,7 @@ function bindGVLogin(){
 }
 function viewGV(){
   if(!GVOK){VIEW="gv";return viewGVLogin()}
-  const tabs=GVQL?[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"]]:[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"],["mg","🧩 Mảnh ghép, bể cá"],["gviec","📣 Giao việc"],["dh","⏰ Đồng hồ"],["tru","⚠️ Trừ điểm"],["pin","🔑 Phát PIN"],["mo","🔓 Mã mở khoá"],["so","☁️ Sổ điểm"],["bc","📊 Mã báo cáo"],["xem","👀 Xem thử"]];
+  const tabs=GVQL?[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"],["fid","🔐 Đăng nhập nhanh"]]:[["td","📋 Theo dõi"],["ptl","🎯 Phân tích lớp"],["mg","🧩 Mảnh ghép, bể cá"],["gviec","📣 Giao việc"],["dh","⏰ Đồng hồ"],["tru","⚠️ Trừ điểm"],["pin","🔑 Phát PIN"],["mo","🔓 Mã mở khoá"],["fid","🔐 Đăng nhập nhanh"],["so","☁️ Sổ điểm"],["bc","📊 Mã báo cáo"],["xem","👀 Xem thử"]];
   let b="";
   if(GVTAB==="pin")b=`<div class="card noprint"><div class="row"><div><label for="glop">Lớp</label><input id="glop" type="text" placeholder="11A3" value="${esc(GV_LOP||"")}"></div><div><label for="gsi">Sĩ số</label><input id="gsi" type="tel" inputmode="numeric" value="${GV_SI||40}"></div></div><button class="btn" id="gpin">Tạo phiếu PIN</button><button class="btn gold" id="gpinx">⬇️ Tải Excel: mã, mật khẩu, quân bài (${Object.keys(LOP_CO).sort().join(", ")})</button><div class="small muted" style="margin-top:6px">🔒 Tệp có mật khẩu của học sinh: cô giữ riêng, không gửi lên nhóm lớp.</div></div><div id="pinout">${GV_LOP?pinSlips():""}</div>`;
   if(GVTAB==="mo")b=moTable();
@@ -1058,6 +1078,7 @@ function viewGV(){
   if(GVTAB==="mg")b=viewManhGhep();
   if(GVTAB==="gviec")b=viewGiaoViec();
   if(GVTAB==="dh")b=viewDongHoGV();
+  if(GVTAB==="fid")b=viewFidGV();
   if(GVTAB==="tru")b=viewTruDiem();
   if(GVTAB==="so")b=`<div class="card">${coSheet()?`<div class="small muted">Link sổ điểm Google Sheet đã gắn vào app:</div><div class="code" style="word-break:break-all">${esc(SHEET)}</div><label for="solop">Lớp</label><select id="solop">${lopGV().map(l=>`<option ${l===GV_SOLOP?"selected":""}>${esc(l)}</option>`).join("")}</select><button class="btn" id="sogv">☁️ Lấy học sinh lớp này từ Google Sheet</button>`:`<div class="err">App chưa gắn link sổ điểm. Cô làm theo tệp “Huong dan so diem Google Sheet”, rồi chạy “DAT LINK GOOGLE SHEET.bat”.</div>`}<div id="somsg"></div></div><div id="soout">${GV_SO}</div>
    <div class="card small"><b>Cô làm trên Google Sheet</b><br>• Trang <b>Điểm</b>: cột A là mã HS (VD 11A3-05), các cột sau cô tự đặt tên (TX1, Giữa kỳ, Nhận xét…). Học sinh xem ở mục 📊 Điểm, cần đúng mã + PIN.<br>• Menu <b>Ôn luyện Tin → 🏅 Lập vinh danh</b>: Sheet chọn tối đa 3 em mỗi lớp cho 3 danh hiệu (Ngôi sao ôn luyện, Nhà chinh phục, Thủ khoa luyện đề). Cô gõ <b>x</b> ở cột “Công bố” thì học sinh mới thấy và tải giấy chứng nhận.<br>• Không ghi họ tên học sinh lên Sheet.</div>
@@ -1111,6 +1132,7 @@ function bindGV(){
   if(GVTAB==="mg")bindManhGhep();
   if(GVTAB==="gviec")bindGiaoViec();
   if(GVTAB==="dh")bindDongHoGV();
+  if(GVTAB==="fid")bindFidGV();
   if(GVTAB==="tru")bindTruDiem();
   document.querySelectorAll("[data-gt]").forEach(b=>b.onclick=()=>{GVTAB=b.dataset.gt;render()});
   const gx=$("#gpinx");if(gx)gx.onclick=taiExcelPIN;
@@ -1342,32 +1364,61 @@ function bindSan(){
 
 /* ══════════ THEO DÕI CỦA CÔ: đăng nhập · làm bài · gói đặc biệt · lên sàn · nhận lời ══════════ */
 const LOP_CO={"11A3": 45, "11A4": 54};
-let TD_LOP="",TD_DS=null,TD_LOC="",TD_LUC="";
+let TD_LOP="",TD_DS=null,TD_LOC="",TD_LUC="",TD_BAI=0,TD_NHOMHT=[];
 const TD_NHOM=[["vao","👤 Đã đăng nhập",r=>!!r],["chua","🚫 Chưa đăng nhập",r=>!r],["lam","✏️ Đã làm bài",r=>!!r&&(+r.bai2>0||+r.tong>0)],["tem","🛂 Có tem hộ chiếu",r=>!!r&&+r.tem>0],["pt","🪞 Đã phản tư",r=>!!r&&+r.ptN>0],["db","🌸 Xong gói đặc biệt",r=>!!r&&+r.dbX>0],["san","⚔️ Đã lên sàn",r=>!!r&&+r.san>0],["nhan","🤝 Đã nhận lời",r=>!!r&&+r.nhan>0]];
+function coRoi(r){return TD_BAI?+(r&&r.roiB)||0:+(r&&r.roiN)||0}
+function quaCong(r){return !!r&&(TD_BAI?+r.caoB>=NGUONG:+r.congDat>0)}
+function theQB(i,r){
+  const ma=maLop(TD_LOP,i),cl=!r?"chua":quaCong(r)?"qua":"dang",roi=coRoi(r);
+  return `<div class="qb ${cl}" title="${esc(ma)}"><span class="stt">${i}</span><span class="la" style="${/[♥♦]/.test(quanBai(ma))?"color:#b91c1c":"color:#111827"}">${quanBai(ma)}</span>${roi?`<span class="roi">👀${roi}</span>`:""}</div>`;
+}
 function viewTheoDoi(){
   const ls=lopGV();if(!TD_LOP)TD_LOP=ls[0]||"";
   if(!coSheet())return `<div class="err">App chưa gắn link sổ điểm Google Sheet.</div>`;
   if(!ls.length)return `<div class="card">Chưa khai báo lớp và sĩ số (nguon/lien_ket.json → "lopCo").</div>`;
-  let h=`<div class="card noprint"><label for="tdlop" style="margin-top:0">Lớp</label><select id="tdlop">${ls.map(l=>`<option ${l===TD_LOP?"selected":""}>${esc(l)}</option>`).join("")}</select>
+  let h=`<div class="card noprint"><div class="row"><div><label for="tdlop" style="margin-top:0">Lớp</label><select id="tdlop">${ls.map(l=>`<option ${l===TD_LOP?"selected":""}>${esc(l)}</option>`).join("")}</select></div>
+   <div style="flex:3;min-width:0"><label for="tdbai" style="margin-top:0">Bài (để trống: tính mọi bài)</label><select id="tdbai" style="width:100%"><option value="">— Mọi bài —</option>${DATA["11"].bai.map(b=>`<option value="${b.so}" ${b.so===TD_BAI?"selected":""}>Bài ${b.so}. ${esc(b.ten)}</option>`).join("")}</select></div></div>
    <button class="btn" id="tdtai">🔄 Lấy dữ liệu mới từ Google Sheet</button><div class="small muted" style="margin-top:6px">${TD_LUC?"Cập nhật lúc "+TD_LUC+". ":"Chưa lấy dữ liệu. "}Số liệu theo lần app học sinh gửi gần nhất.</div><div id="tdmsg"></div></div>`;
   if(!TD_DS)return h;
   const si=LOP_CO[TD_LOP]||0,map={};TD_DS.forEach(r=>{if(r.ma.split("-")[0]===TD_LOP)map[+r.ma.split("-")[1]]=r});
   const rows=[];for(let i=1;i<=si;i++)rows.push([i,map[i]]);
   Object.keys(map).forEach(k=>{if(+k>si)rows.push([+k,map[k]])});
+  const tenB=TD_BAI?`Bài ${TD_BAI}`:"bài nào",nhom=[
+    ["chua",`🚫 Chưa đăng nhập`,rows.filter(([_,r])=>!r),"Chưa vào app, cô nhắc qua nhóm lớp hoặc trên lớp."],
+    ["cong",`🚪 Đã vào nhưng chưa vượt Cổng ${tenB}`,rows.filter(([_,r])=>r&&!quaCong(r)),`Chưa đạt từ ${NGUONG}/10.`],
+    ["roi",`👀 Rời tab khi đang làm bài`,rows.filter(([_,r])=>coRoi(r)>0),"Số 👀 là số lần rời. Mở Hỏi AI từ nút trong app không bị tính. App không biết em chuyển sang đâu, khoá màn hình cũng bị tính, nên cô hỏi em trước khi kết luận."]];
+  h+=`<div class="sec-t">Cần cô chú ý · lớp ${esc(TD_LOP)}</div>`+nhom.map(n=>`<div class="card"><div class="row" style="align-items:center"><b style="flex:4">${n[1]}: ${n[2].length}${n[0]==="roi"?"":`/${si}`}</b></div><div class="small muted" style="margin:4px 0 8px">${n[3]}</div>
+   <div class="luoiqb">${n[2].map(([i,r])=>theQB(i,r)).join("")||'<span class="small muted">Không có em nào.</span>'}</div>
+   ${n[2].length&&!GVQL?`<div class="row noprint" style="margin-top:8px"><button class="btn ghost" data-chepn="${n[0]}" style="margin:0;padding:10px;font-size:15px">📋 Chép tin nhắc gửi nhóm lớp</button>${n[0]!=="chua"?`<button class="btn" data-nhac="${n[0]}" style="margin:0;padding:10px;font-size:15px">📣 Nhắc trong app</button>`:""}</div>`:""}</div>`).join("");
+  TD_NHOMHT=nhom;
+  h+=`<div class="sec-t">Cả lớp theo quân bài</div><div class="card"><div class="luoiqb">${rows.map(([i,r])=>theQB(i,r)).join("")}</div><div class="small muted" style="margin-top:8px">Số trên đầu là số thứ tự. Xanh: đã vượt Cổng · Vàng: đã vào, chưa vượt · Xám: chưa đăng nhập.</div></div>`;
   h+=`<div class="grid2">${TD_NHOM.map(n=>{const a=rows.filter(([_,r])=>n[2](r));return `<button class="tile" data-loc="${n[0]}" style="border:2px solid ${TD_LOC===n[0]?"var(--brand)":"transparent"}"><div class="v">${a.length}<span class="small muted">/${si}</span></div><div class="l">${n[1]}</div></button>`}).join("")}</div>`;
   const loc=TD_LOC?TD_NHOM.find(n=>n[0]===TD_LOC):null;
-  if(loc)h+=`<div class="card"><b>${loc[1]} · lớp ${esc(TD_LOP)}</b><div style="margin-top:6px">${rows.filter(([_,r])=>loc[2](r)).map(([i])=>`<span class="chip">${esc(TD_LOP)}-${String(i).padStart(2,"0")}</span>`).join("")||'<span class="small muted">Không có em nào.</span>'}</div></div>`;
-  h+=`<div class="card bang-td"><table><tr><th>STT</th><th>Trạng thái</th><th>⭐</th><th>Bài ★★</th><th>🛂</th><th>🪞</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>Gửi lúc</th></tr>
-   ${rows.map(([i,r])=>`<tr><td><b>${i}</b> <span class="small muted">${quanBai(TD_LOP+"-"+i)}</span></td><td>${!r?"🚫 Chưa vào":(+r.bai2>0||+r.tong>0)?"✏️ Đang học":"👤 Mới vào"}</td><td>${r?r.tong:""}</td><td>${r?r.bai2:""}</td><td>${r?r.tem||0:""}</td><td>${r?r.ptN||0:""}</td><td>${r?r.dbX||0:""}</td><td>${r?r.san||0:""}</td><td>${r?r.nhan||0:""}</td><td class="small">${r?esc(String(r.luc).slice(0,16)):""}</td></tr>`).join("")}</table>
-   <div class="small muted" style="margin-top:6px">🌸 số gói đặc biệt đã xong · ⚔️ số lời thách em đưa lên sàn · 🤝 số lần nhận lời thách của bạn. Bấm vào ô tổng hợp phía trên để xem danh sách mã. Chỉ có mã Lớp-STT.</div></div>`;
+  if(loc)h+=`<div class="card"><b>${loc[1]} · lớp ${esc(TD_LOP)}</b><div class="luoiqb" style="margin-top:8px">${rows.filter(([_,r])=>loc[2](r)).map(([i,r])=>theQB(i,r)).join("")||'<span class="small muted">Không có em nào.</span>'}</div></div>`;
+  h+=`<div class="card bang-td"><table><tr><th>STT</th><th>Trạng thái</th><th>⭐</th><th>Bài ★★</th><th>🛂</th><th>🪞</th><th>👀</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>Gửi lúc</th></tr>
+   ${rows.map(([i,r])=>`<tr><td><b>${i}</b> <span class="small muted">${quanBai(TD_LOP+"-"+i)}</span></td><td>${!r?"🚫 Chưa vào":(+r.bai2>0||+r.tong>0)?"✏️ Đang học":"👤 Mới vào"}</td><td>${r?r.tong:""}</td><td>${r?r.bai2:""}</td><td>${r?r.tem||0:""}</td><td>${r?r.ptN||0:""}</td><td>${r?coRoi(r):""}</td><td>${r?r.dbX||0:""}</td><td>${r?r.san||0:""}</td><td>${r?r.nhan||0:""}</td><td class="small">${r?esc(String(r.luc).slice(0,16)):""}</td></tr>`).join("")}</table>
+   <div class="small muted" style="margin-top:6px">👀 số lần rời tab khi làm bài · 🌸 gói đặc biệt đã xong · ⚔️ lời thách lên sàn · 🤝 lần nhận lời. Chỉ có mã Lớp-STT.</div></div>`;
   return h;
+}
+function layTheoDoi(){
+  return fetch(SHEET+"?a=gv&gv="+encodeURIComponent(GVPIN)).then(r=>r.json()).then(d=>{if(!d.ok)throw new Error(d.loi);
+    if(!TD_BAI)return d.ds;
+    return fetch(SHEET+"?a=gvlop&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(TD_LOP)+"&bai="+TD_BAI).then(r=>r.json()).then(x=>{if(!x.ok)throw new Error(x.loi);
+      const c={};x.cong.forEach(o=>c[o.ma]=o);d.ds.forEach(r=>{const o=c[r.ma];r.caoB=o?o.cao:0;r.roiB=o?o.roi:0});return d.ds})});
 }
 function bindTheoDoi(){
   const s=$("#tdlop");if(s)s.onchange=()=>{TD_LOP=s.value;TD_LOC="";render()};
+  const bb=$("#tdbai");if(bb)bb.onchange=()=>{TD_BAI=+bb.value||0;TD_DS=null;TD_LUC="";render()};
   document.querySelectorAll("[data-loc]").forEach(x=>x.onclick=()=>{TD_LOC=TD_LOC===x.dataset.loc?"":x.dataset.loc;render()});
   const t=$("#tdtai");if(t)t.onclick=()=>{t.disabled=true;t.textContent="⏳ Đang lấy…";
-    fetch(SHEET+"?a=gv&gv="+encodeURIComponent(GVPIN)).then(r=>r.json()).then(d=>{if(!d.ok)throw new Error(d.loi);TD_DS=d.ds;TD_LUC=new Date().toLocaleString("vi-VN");render()})
+    layTheoDoi().then(ds=>{TD_DS=ds;TD_LUC=new Date().toLocaleString("vi-VN");render()})
      .catch(e=>{t.disabled=false;t.textContent="🔄 Lấy dữ liệu mới từ Google Sheet";$("#tdmsg").innerHTML=`<div class="err">${esc(e.message||"Chưa lấy được.")}</div>`})};
+  const tenViec=k=>({chua:"vào app Chinh phục Tin học 11",cong:`vượt Cổng ${NGUONG}/10${TD_BAI?" Bài "+TD_BAI:""}`,roi:"tập trung làm bài, không rời sang việc khác khi đang làm"}[k]);
+  document.querySelectorAll("[data-chepn]").forEach(x=>x.onclick=()=>{const k=x.dataset.chepn,n=TD_NHOMHT.find(z=>z[0]===k),ds=n[2].map(([i])=>`${i} (${quanBai(maLop(TD_LOP,i))})`).join(", "),tin=`Lớp ${TD_LOP}: các bạn số ${ds} nhớ ${tenViec(k)} nhé.`;
+    (navigator.clipboard?navigator.clipboard.writeText(tin):Promise.reject()).then(()=>toast("Đã chép ✓"),()=>prompt("Cô chép đoạn này:",tin))});
+  document.querySelectorAll("[data-nhac]").forEach(x=>x.onclick=()=>{const k=x.dataset.nhac,n=TD_NHOMHT.find(z=>z[0]===k),ds=n[2].map(([i])=>maLop(TD_LOP,i));
+    const ly=`Em nhớ ${tenViec(k)} nhé.`;if(!confirm(`Gửi nhắc tới ${ds.length} em lớp ${TD_LOP}?\n"${ly}"\nEm nào có mạng sẽ thấy ở màn Lộ trình. Không trừ điểm.`))return;
+    x.disabled=true;guiTru({id:"nhac"+Date.now(),kieu:"Nhắc",lop:TD_LOP,ai:"Nhắc",ly,ds}).then(()=>toast("Đã gửi lời nhắc ✓"),()=>{x.disabled=false;toast("Chưa gửi được, cô thử lại nhé")})});
 }
 
 /* ══════════ THEO APP CỔNG SẴN SÀNG: Cổng 7/10 · Hỏi AI · Phản tư · Hộ chiếu · Xếp hạng · Trang giáo viên lớp học ══════════ */
@@ -1468,11 +1519,13 @@ function bindKQCong(){
 // rời tab khi đang làm Cổng: chỉ nhắc nhẹ và cô thấy số lần, không trừ điểm
 let ROI_LUC=0;
 document.addEventListener("visibilitychange",()=>{
-  const V=VIEW&&VIEW.t==="cong"&&!VIEW.done?VIEW:null;
+  const V=U&&!U.xem&&VIEW&&["cong","tdc","dbc","quiz"].includes(VIEW.t)&&!VIEW.done?VIEW:null;
   if(document.hidden){if(V)ROI_LUC=Date.now();return}
   if(!V||!ROI_LUC){ROI_LUC=0;return}
   const ms=Date.now()-ROI_LUC;ROI_LUC=0;if(ms<1000)return;
-  V.roi.n++;V.roi.ms+=ms;const r=$("#roibao");if(r)r.innerHTML=`<div class="err">🌱 Em vừa rời sang nơi khác (${V.roi.n} lần, cô thấy số này). Tập trung nốt lượt này nhé!</div>`;
+  const R=U.roi||(U.roi={n:0,g:0});R.n++;R.g+=Math.round(ms/1000);save();
+  if(V.t==="cong"){V.roi.n++;V.roi.ms+=ms;const r=$("#roibao");if(r)r.innerHTML=`<div class="err">🌱 Em vừa rời khỏi bài (${V.roi.n} lần, cô thấy số này). Tập trung nốt lượt này nhé!</div>`}
+  else toast("🌱 Em vừa rời khỏi bài, cô thấy số lần này. Tập trung nốt lượt này nhé!");
 });
 
 /* ── Hỏi AI đúng cách */
@@ -1659,11 +1712,12 @@ const XP_TRU=8,LY_TRU=["Không vào vị trí đúng thời gian","Không tuân 
 function apTru(nguoi,d){
   const ds=d.tru||[];nguoi.truDa=nguoi.truDa||{};let moi=0;
   ds.forEach(t=>{if(nguoi.truDa[t.id])return;nguoi.truDa[t.id]=1;moi++;const x=nguoi.xp||(nguoi.xp={td:0,db:0,tuan:{}});
+    if(t.kieu==="Nhắc"){(nguoi.tbMoi=nguoi.tbMoi||[]).push(`📣 ${GV} nhắc: ${t.ly}`);return}
     x.tru=(x.tru||0)+(t.kieu==="Hoàn"?XP_TRU:-XP_TRU);
-    (nguoi.tbMoi=nguoi.tbMoi||[]).push(t.kieu==="Hoàn"?`↩️ ${GV} hoàn lại ${XP_TRU} ⭐ đã trừ (${t.ai}).`:`⚠️ ${t.ai} — lỗi không hợp tác (${t.ly}): −${XP_TRU} ⭐ điểm tích luỹ. Lần sau cùng nhau giữ đúng nội quy, hợp tác cùng nhóm nhé!`)});
+    (nguoi.tbMoi=nguoi.tbMoi||[]).push(t.kieu==="Hoàn"?`↩️ ${GV} hoàn lại ${XP_TRU} ⭐ đã trừ (${t.ai}).`:`⚠️ ${t.ai} — lỗi không hợp tác (${t.ly}): −${XP_TRU} ⭐ điểm tích luỹ trò chơi (không phải điểm học tập). Lần sau cùng nhau giữ đúng nội quy, hợp tác cùng nhóm nhé!`)});
   if(moi&&nguoi===U){save();if(!VIEW)render()}else if(moi)ghiMay();
 }
-function theTBMoi(){const a=U.tbMoi||[];return a.length?`<div class="card" style="border:2px solid var(--gold)"><b>📣 Tin từ ${GV}</b>${a.map(t=>`<div class="small" style="margin-top:6px">${esc(t)}</div>`).join("")}<div class="small muted" style="margin-top:6px">Đây là điểm tích luỹ trò chơi, không phải điểm học tập.</div><button class="btn ghost" id="tbok">Em đã đọc</button></div>`:""}
+function theTBMoi(){const a=U.tbMoi||[];return a.length?`<div class="card" style="border:2px solid var(--gold)"><b>📣 Tin từ ${GV}</b>${a.map(t=>`<div class="small" style="margin-top:6px">${esc(t)}</div>`).join("")}<button class="btn ghost" id="tbok">Em đã đọc</button></div>`:""}
 function ganTBMoi(){const b=$("#tbok");if(b)b.onclick=()=>{U.tbMoi=[];ghiMay();render()}}
 let TRU_LOAI="hs",TRU_SO=null,TRU_MSG="";
 const maLop=(l,i)=>l+"-"+String(i).padStart(2,"0");
@@ -1864,6 +1918,64 @@ function luuTheCP(so_,k){
   cv.toBlob(x=>luuTep(x,`The chinh phuc ${U.code} Bai ${so_}.png`,"Thẻ chinh phục"),"image/png");
 }
 
+/* ══════════ NÚT CHUNG MỌI TRANG: về trang giáo viên khi xem thử · về đầu trang ══════════ */
+function veThem(){
+  const a=$("#app");
+  if(U&&U.xem){const x=document.createElement("div");x.className="thanhxem noprint";x.innerHTML='<span>👀 Cô đang xem thử</span><button id="vegv">← Về trang giáo viên</button>';a.prepend(x);
+    $("#vegv").onclick=()=>{U=null;VIEW="gvhome";stopTimer();clearInterval(TD_T);render();window.scrollTo(0,0)}}
+  const n=document.createElement("button");n.className="nutdau noprint";n.textContent="⬆️ Về đầu trang";n.onclick=()=>window.scrollTo({top:0,behavior:"smooth"});a.appendChild(n);
+}
+
+/* ══════════ ĐĂNG NHẬP BẰNG KHUÔN MẶT / VÂN TAY: máy tự kiểm tra (WebAuthn), app không nhận và không lưu ảnh mặt, dấu vân tay ══════════ */
+const KHOA_FID=KEY+"_fid";
+const dsFid=()=>{try{const d=JSON.parse(localStorage.getItem(KHOA_FID)||"{}");d.hs=d.hs||{};return d}catch(e){return {hs:{}}}};
+const ghiFid=d=>{try{localStorage.setItem(KHOA_FID,JSON.stringify(d))}catch(e){}};
+const b64=u=>btoa(String.fromCharCode(...new Uint8Array(u))),tuB64=s=>Uint8Array.from(atob(s),x=>x.charCodeAt(0)),ngauNhien=n=>crypto.getRandomValues(new Uint8Array(n));
+const coTheFid=()=>!TRONG_KHUNG&&!!window.PublicKeyCredential&&window.isSecureContext;
+const loiFid=e=>e&&e.name==="NotAllowedError"?"đã huỷ hoặc chưa quét xong":"máy hoặc trình duyệt này chưa hỗ trợ";
+async function taoFid(ten){
+  if(!coTheFid()||!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()))throw new Error("khong ho tro");
+  const k=await navigator.credentials.create({publicKey:{challenge:ngauNhien(32),rp:{name:"Chinh phục Tin học 11"},user:{id:ngauNhien(16),name:ten,displayName:ten},
+    pubKeyCredParams:[{type:"public-key",alg:-7},{type:"public-key",alg:-257}],authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"discouraged"},timeout:60000}});
+  return b64(k.rawId);
+}
+const kiemFid=id=>navigator.credentials.get({publicKey:{challenge:ngauNhien(32),allowCredentials:[{type:"public-key",id:tuB64(id)}],userVerification:"required",timeout:60000}});
+function huongDanFid(){return `<div class="small" style="margin-top:6px">Chức năng này chỉ chạy khi mở app ở cửa sổ riêng hoặc bản cài trên màn hình chính, không chạy trong khung Google Sites.</div>${TRANG_APP?`<a class="btn ghost" style="display:block;text-align:center;text-decoration:none" href="${esc(TRANG_APP)}" target="_blank" rel="noopener">↗️ Mở app ở cửa sổ riêng</a>`:""}`}
+function ghiChuFid(){return `<div class="small muted" style="margin-top:6px">🔒 Máy tự kiểm tra khuôn mặt, vân tay; app và Google Sheet không nhận ảnh mặt hay dấu vân tay. Chỉ bật trên máy của riêng mình: ai đã đăng kí khuôn mặt, vân tay trên máy này cũng vào được. Quên, đổi máy vẫn vào được bằng mã như thường.</div>`}
+/* học sinh: Tài khoản → bật; màn đăng nhập → nút vào nhanh */
+function theFidHS(){
+  if(U.xem)return "";
+  const co=dsFid().hs[U.code];
+  return `<div class="card"><h3 style="margin:0 0 6px">🔐 Đăng nhập bằng khuôn mặt, vân tay</h3>${co?`<div class="okmsg">✅ Đang bật trên máy này</div><button class="btn ghost" id="fidtat">Tắt trên máy này</button>`:coTheFid()?`<button class="btn" id="fidbat">🔐 Bật trên máy này</button>`:huongDanFid()}${ghiChuFid()}<div id="fidmsg"></div></div>`;
+}
+function ganFidHS(){
+  const b=$("#fidbat");if(b)b.onclick=async()=>{try{const id=await taoFid(U.code),d=dsFid();d.hs[U.code]={id};ghiFid(d);toast("🔐 Đã bật");render()}catch(e){$("#fidmsg").innerHTML=`<div class="err">Chưa bật được: ${loiFid(e)}.</div>`}};
+  const t=$("#fidtat");if(t)t.onclick=()=>{const d=dsFid();delete d.hs[U.code];ghiFid(d);toast("Đã tắt. Em vẫn vào được bằng mã và PIN");render()};
+}
+function nutFidVao(){
+  if(!coTheFid())return "";
+  const ds=Object.keys(dsFid().hs).filter(m=>MEM.users[m]&&/^11/.test(m));
+  return ds.length?`<div class="card">${ds.map(m=>`<button class="btn" data-fidvao="${esc(m)}">🔐 Vào bằng khuôn mặt, vân tay · ${esc(m)}</button>`).join("")}<div id="fidmsg"></div></div>`:"";
+}
+function ganFidVao(){
+  document.querySelectorAll("[data-fidvao]").forEach(x=>x.onclick=async()=>{const m=x.dataset.fidvao,f=dsFid().hs[m];
+    try{await kiemFid(f.id);U=MEM.users[m];MEM.last=m;save();VIEW=null;TAB="map";render();toast("Chào "+m+"!");setTimeout(()=>soNen(),1500)}
+    catch(e){$("#fidmsg").innerHTML=`<div class="err">Chưa mở khoá được: ${loiFid(e)}. Em nhập mã và PIN nhé.</div>`}});
+}
+/* giáo viên: tab Đăng nhập nhanh; màn đăng nhập giáo viên → nút vào nhanh */
+function viewFidGV(){
+  const co=dsFid().gv;
+  return `<div class="card"><h3 style="margin:0 0 6px">🔐 Đăng nhập trang giáo viên bằng khuôn mặt, vân tay</h3>${co?`<div class="okmsg">✅ Đang bật trên máy này</div><button class="btn ghost" id="fgtat">Tắt trên máy này</button>`:coTheFid()?`<button class="btn" id="fgbat">🔐 Bật trên máy này</button>`:huongDanFid()}${ghiChuFid()}<div class="small muted" style="margin-top:6px">Mã giáo viên được cất trên máy này để mở trang sau khi quét. Cô không bật trên máy tính dùng chung của trường.</div><div id="fgmsg"></div></div>`;
+}
+function bindFidGV(){
+  const b=$("#fgbat");if(b)b.onclick=async()=>{try{const id=await taoFid("Giáo viên"),d=dsFid();d.gv={id,ma:GVPIN};ghiFid(d);toast("🔐 Đã bật");render()}catch(e){$("#fgmsg").innerHTML=`<div class="err">Chưa bật được: ${loiFid(e)}.</div>`}};
+  const t=$("#fgtat");if(t)t.onclick=()=>{const d=dsFid();delete d.gv;ghiFid(d);toast("Đã tắt. Cô vẫn vào được bằng mã");render()};
+}
+function nutFidGV(){return coTheFid()&&dsFid().gv?`<button class="btn gold" id="fgvao">🔐 Vào bằng khuôn mặt, vân tay</button>`:""}
+function ganFidGVVao(){
+  const b=$("#fgvao");if(b)b.onclick=async()=>{const f=dsFid().gv;try{await kiemFid(f.id);$("#gvpin").value=f.ma;$("#gvgo").click()}catch(e){$("#gvmsg").innerHTML=`<div class="err">Chưa mở khoá được: ${loiFid(e)}. Cô nhập mã nhé.</div>`}};
+}
+
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */
 // ───── GIẤY CHỨNG NHẬN A5 ngang (210 × 148 mm) — vẽ bằng canvas: cô in, học sinh lưu ảnh về điện thoại
@@ -2011,7 +2123,7 @@ function luuAnhCN(cv, ten){
 loadStore();
 try{const t=localStorage.getItem(KEY+"_theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}
 // bản chỉ còn Tin 11: tài khoản lớp 10, 12 cũ trên máy không tự vào nữa
-if(MEM.last&&MEM.users[MEM.last]&&MEM.users[MEM.last].g==="11")U=MEM.users[MEM.last];
+if(MEM.last&&MEM.users[MEM.last]&&MEM.users[MEM.last].g==="11"&&!(coTheFid()&&dsFid().hs[MEM.last]))U=MEM.users[MEM.last];   // đã bật khuôn mặt, vân tay thì quét mới vào
 render();
 if(U&&U.canGui){baoGui("cho");setTimeout(guiNgay,1500)}
 // lấy sổ điểm nền (để hiện phiếu khảo sát, vinh danh mới) — tối đa 1 lần/giờ; quay lại app sau khi làm phiếu thì kiểm lại
