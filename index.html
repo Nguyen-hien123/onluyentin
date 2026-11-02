@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261101-2354"</script>
+<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261102-2220"</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%234f46e5'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'%3ETin%3C/text%3E%3C/svg%3E">
 <style>
 :root{
@@ -320,6 +320,10 @@ body::before{content:"";position:fixed;left:0;right:0;bottom:0;height:40vh;backg
 #tenNoi{position:fixed;z-index:99;background:#111033;color:#fff;padding:7px 12px;border-radius:10px;font-weight:700;font-size:16px;box-shadow:0 4px 14px rgba(0,0,0,.35);max-width:90vw;pointer-events:none}
 [data-ma]{cursor:help}
 @media print{#tenNoi{display:none}}
+.lopbar{background:var(--ml);color:#fff;border-radius:14px;padding:10px 16px;margin-bottom:14px;font-size:18px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.wrap.colop .card{border-left:7px solid var(--ml)}
+.wrap.colop select{background:var(--mlnhat);color:#111827;border-color:var(--ml);font-weight:700}
+.mlop{display:inline-block;border-radius:8px;padding:1px 8px;color:#fff;font-weight:700}
 </style>
 </head>
 <body>
@@ -422,7 +426,7 @@ function trackMonth(){
   U.lastPts=tp;U.lastN2=n2;
 }
 let SYNC_T=null;
-function henGui(){if(!U||U.xem||!coSheet())return;U.canGui=1;baoGui("cho");clearTimeout(SYNC_T);SYNC_T=setTimeout(guiNgay,1200)}
+function henGui(){if(!U||U.xem||!coSheet())return;if(U.choKP){U.canGui=1;baoGui("cho");return}U.canGui=1;baoGui("cho");clearTimeout(SYNC_T);SYNC_T=setTimeout(guiNgay,1200)}
 // thanh trạng thái gửi kết quả tới sổ của cô (nổi trên mọi màn hình)
 let GUI_TT="";
 function baoGui(tt,t){
@@ -448,6 +452,7 @@ function goiGui(){
 }
 function guiNgay(){
   guiTDCho();guiSKCho();
+  if(U&&U.choKP){khoiPhuc();return Promise.resolve(false)}
   if(!U||U.xem||!coSheet()||!U.canGui)return Promise.resolve(false);
   if(navigator.onLine===false){baoGui("loi");return Promise.resolve(false)}
   const nguoi=U,goi=goiGui();baoGui("dang");
@@ -458,6 +463,7 @@ function guiNgay(){
 function xacNhan(nguoi,tong){
   setTimeout(()=>{if(U!==nguoi)return;
     taiSo().then(d=>{if(U!==nguoi)return;
+      if(d.td&&+d.td.tong>tong+40&&totalPts(nguoi)<+d.td.tong/2){nguoi.choKP=1;khoiPhuc();return}
       if(d.td&&+d.td.tong>=tong){nguoi.toiCo=Date.now();ghiMay();baoGui("toi",nguoi.toiCo);if(!VIEW&&(TAB==="toi"||TAB==="diem"))render()}
       else{nguoi.canGui=1;ghiMay();baoGui("loi")}
     }).catch(()=>{if(U===nguoi){nguoi.canGui=1;ghiMay();baoGui("loi")}})},1500);
@@ -478,40 +484,35 @@ function taiSo(){
     nguoi.so=Object.assign({},d,{td:d.td?Object.assign({},d.td,{u:undefined}):null,t:Date.now()});ghiMay();if(!nguoi.xem)apTru(nguoi,d);return d});
 }
 // đăng nhập trên máy mới: lấy lại tiến độ đã lưu trên sổ của cô
+// đăng nhập lại / đổi máy: lấy tiến độ trên sổ về TRƯỚC, xong mới cho gửi; mất mạng thì giữ chờ, có mạng làm tiếp
+let KP_DANG=0;
 function khoiPhuc(){
-  if(!coSheet()||U.xem||totalPts()>0||navigator.onLine===false)return;
-  const code=U.code;
+  if(!U||!coSheet()||U.xem||KP_DANG||navigator.onLine===false)return;
+  const code=U.code,nguoi=U;KP_DANG=1;
   taiSo().then(d=>{
-    if(!U||U.code!==code)return;
-    const ve=()=>{if(!VIEW)render()};
-    if(!d.td||!d.td.u)return ve();
-    let cu;try{cu=JSON.parse(d.td.u)}catch(e){return ve()}
-    if(!cu||cu.code!==code)return ve();
-    const nu=Object.assign(newUser(code,U.g),cu,{so:U.so});
-    if(totalPts(nu)<=0||!confirm(`Sổ của cô đang lưu tiến độ của ${code}: ${totalPts(nu)} điểm thưởng. Lấy về máy này?`))return ve();
-    MEM.users[code]=U=nu;ghiMay();render();toast("Đã lấy lại tiến độ ✓");
-  }).catch(()=>{});
+    KP_DANG=0;if(U!==nguoi)return;
+    nguoi.choKP=0;
+    let cu=null;try{cu=d.td&&d.td.u?JSON.parse(d.td.u):null}catch(e){}
+    if(cu&&cu.code===code){const nu=Object.assign(newUser(code,nguoi.g),cu,{so:nguoi.so,skCho:nguoi.skCho,tdCho:nguoi.tdCho});
+      if(totalPts(nu)>totalPts(nguoi)){nu.canGui=0;MEM.users[code]=U=nu;ghiMay();render();toast(`Đã lấy lại tiến độ của em: ${totalPts(nu)} ⭐ ✓`);return}}
+    ghiMay();if(!VIEW)render();if(U.canGui)henGui();
+  }).catch(()=>{KP_DANG=0;if(U===nguoi)baoGui("loi")});
 }
 
 /* mở khoá */
+// mỗi bài chỉ mở khi cô gửi mã bài đó (hoặc mã chặng, mã mở tất cả); bài em đã học từ trước vẫn giữ nguyên
+function moBai(so){return !!(U.mo["b"+so]||Object.keys(U.lp[so]||{}).length||((U.cong||{})[so]||{}).luot)}
 function chuongOpen(g,idx){
   if(U.xem)return true;
-  const cs=chuongs(g); const c=cs[idx];
+  const c=chuongs(g)[idx];
   if(c.bai.every(b=>b.cho))return false;
-  if(U.mo["all"]||U.mo["cd"+c.cd])return true;
-  if(idx===0)return true;
-  const prev=cs[idx-1];
-  if(prev.bai.every(b=>b.cho))return true;
-  return !!(U.boss[prev.cd]&&U.boss[prev.cd].pass);
+  return !!(U.mo["all"]||U.mo["cd"+c.cd]||c.bai.some(b=>!b.cho&&moBai(b.so)));
 }
 function baiOpen(g,idx,j){
   const c=chuongs(g)[idx]; const b=c.bai[j];
   if(b.cho)return false;
   if(U.xem)return true;
-  if(U.mo["b"+b.so])return true;
-  if(!chuongOpen(g,idx))return false;
-  if(U.mo["all"]||U.mo["cd"+c.cd]||j===0)return true;
-  const pv=c.bai[j-1]; return quaBai(pv.so);
+  return !!(U.mo["all"]||U.mo["cd"+c.cd]||moBai(b.so));
 }
 function bossOpen(g,idx){
   const c=chuongs(g)[idx];
@@ -573,8 +574,8 @@ function bindLogin(){
     const code=maHS(lop,stt);
     if(pin!==pinOf(code))return err("Mã PIN chưa đúng. Em kiểm tra lại hoặc hỏi "+GV+".");
     if(!MEM.users[code])MEM.users[code]=newUser(code,m[1]);
-    U=MEM.users[code];U.g=m[1];MEM.last=code;save();VIEW=null;TAB="map";render();
-    toast("Chào "+code+"! Cùng chinh phục chặng mới nhé 💪");if(totalPts()>0)setTimeout(()=>soNen(),1500);else khoiPhuc();
+    U=MEM.users[code];U.g=m[1];MEM.last=code;if(totalPts()<=0&&coSheet())U.choKP=1;save();VIEW=null;TAB="map";render();
+    toast("Chào "+code+"! Cùng chinh phục chặng mới nhé 💪");if(U.choKP)khoiPhuc();else setTimeout(()=>soNen(),1500);
   };
 }
 
@@ -609,12 +610,12 @@ function viewMap(){
     h+=`<div class="card chang ${open?"":"locked"}" style="--cc:${c.color}">
      <div class="hd"><div class="num">${open?i+1:"🔒"}</div><div style="flex:1"><div class="small muted">Chặng ${i+1}</div><h3>${esc(c.ten)}</h3></div>
      <span class="badge">${done}/${c.bai.length}</span></div>`;
-    if(open){
+    if(!c.bai.every(b=>b.cho)){
       h+=`<div class="path">`;
       c.bai.forEach((b,j)=>{
         const o=baiOpen(g,i,j), st=(U.lp[b.so]||{}).st||0;
-        h+=`<button class="node ${o?"":"locked"}" ${o?`data-bai="${b.so}"`:`data-lock="${b.cho?"cho":"bai"}"`} style="--cc:${c.color}">
-          <span class="dot">${o?b.so:"🔒"}</span><span class="t">Bài ${b.so}. ${esc(b.ten)}</span>${o&&!b.cho?`<span class="stars">${starStr(st)}</span>`:""}</button>`;
+        h+=`<button class="node ${o?"":"locked"}" ${o?`data-bai="${b.so}"`:`data-lock="${b.cho?"cho":"bai"}" data-so="${b.so}"`} style="--cc:${c.color}">
+          <span class="dot">${o?b.so:"🔒"}</span><span class="t">Bài ${b.so}. ${esc(b.ten)}${o?"":'<br><span class="small muted">Chạm để nhập mã cô gửi</span>'}</span>${o&&!b.cho?`<span class="stars">${starStr(st)}</span>`:""}</button>`;
       });
       if(!c.bai.every(b=>b.cho)){
         const bo=bossOpen(g,i);
@@ -623,7 +624,7 @@ function viewMap(){
       }
       h+=`</div>`;
     } else {
-      h+=`<div class="small muted" style="margin-top:8px">${c.bai.every(b=>b.cho)?"Nội dung đang được cô cập nhật.":"Vượt thử thách chặng trước hoặc nhập mã mở khoá của cô (mục Tài khoản)."}</div>`;
+      h+=`<div class="small muted" style="margin-top:8px">Nội dung đang được cô cập nhật.</div>`;
     }
     h+=`</div>`;
   });
@@ -633,7 +634,10 @@ function bindMain(){
   ganCai();ganKhaoSat();ganTBMoi();
   document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{TAB=b.dataset.tab;render();window.scrollTo(0,0)});
   document.querySelectorAll("[data-bai]").forEach(b=>b.onclick=()=>{VIEW={t:"bai",so:+b.dataset.bai,tab:"tt"};render()});
-  document.querySelectorAll("[data-lock]").forEach(b=>b.onclick=()=>{const k=b.dataset.lock;toast(k==="cho"?"Bài này cô đang cập nhật nội dung.":k==="boss"?"Đạt ★★ ở mọi bài của chặng để mở thử thách.":"Đạt ★★ ở bài trước để mở bài này.")});
+  document.querySelectorAll("[data-lock]").forEach(b=>b.onclick=()=>{const k=b.dataset.lock;
+    if(k!=="bai")return toast(k==="cho"?"Bài này cô đang cập nhật nội dung.":"Đạt ★★ ở mọi bài của chặng để mở thử thách.");
+    const so=+b.dataset.so,v=(prompt(`Nhập mã cô gửi để mở Bài ${so}`)||"").trim().toUpperCase();if(!v)return;
+    if(v===maMoBai(U.g,so)||v===maCong(so)){U.mo["b"+so]=1;cg(so).moC=1;save();render();toast(`🔓 Đã mở Bài ${so}`)}else toast("Mã chưa đúng. Em kiểm tra lại tin nhắn của cô nhé.")});
   document.querySelectorAll("[data-boss]").forEach(b=>b.onclick=()=>startBoss(+b.dataset.boss));
   if(TAB==="de")bindDe();
   if(TAB==="toi")bindToi();
@@ -1044,7 +1048,7 @@ function bindToi(){
   $("#nhapmo").onclick=()=>{
     const v=$("#mamo").value.trim().toUpperCase();const g=U.g;let ok=null;
     if(v&&v===maMoKhoi(g)){U.mo.all=1;ok="toàn bộ các chặng Tin "+g}
-    chuongs(g).forEach((c,i)=>{if(v===maMoChuong(g,c.cd)){U.mo["cd"+c.cd]=1;ok="Chặng "+(i+1)+": "+c.ten}c.bai.forEach(b=>{if(v===maMoBai(g,b.so)){U.mo["b"+b.so]=1;ok="Bài "+b.so+". "+b.ten}})});
+    chuongs(g).forEach((c,i)=>{if(v===maMoChuong(g,c.cd)){U.mo["cd"+c.cd]=1;ok="Chặng "+(i+1)+": "+c.ten}c.bai.forEach(b=>{if(v===maMoBai(g,b.so)||v===maCong(b.so)){U.mo["b"+b.so]=1;cg(b.so).moC=1;ok="Bài "+b.so+". "+b.ten}})});
     $("#momsg").innerHTML=ok?`<div class="okmsg">Đã mở khoá ${esc(ok)} 🔓</div>`:`<div class="err">Mã chưa đúng hoặc không dành cho khối của em.</div>`;
     if(ok){save();$("#mamo").value=""}
   };
@@ -1089,8 +1093,10 @@ function viewGV(){
   if(GVTAB==="bc")b=`<div class="card"><div class="small muted">Dán các mã báo cáo học sinh gửi (mỗi mã một dòng, dán lẫn chữ khác cũng được).</div><textarea id="bcin" placeholder="BC~11A3-05~...">${esc(GV_BC||"")}</textarea><button class="btn" id="bcgo">Đọc báo cáo</button></div><div id="bcout"></div>`;
   if(GVTAB==="xem")b=`<div class="card"><div class="small muted">Mở app như học sinh với <b>mọi bài đã mở khoá</b> để cô duyệt nội dung, câu hỏi. Tiến độ xem thử lưu riêng, không lẫn với học sinh.</div><button class="btn ghost" data-xem="11">Xem thử Tin 11</button></div>
    <div class="card small"><b>Thống kê ngân hàng câu hỏi Tin 11</b><br>${(bs=>`${bs.length} bài · ${bs.reduce((s,b)=>s+(b.td||[]).length,0)} câu Cổng, Thách đấu (50 câu mỗi bài) · ${bs.filter(b=>b.db).length} gói đặc biệt (12 câu mỗi gói, lấy từ ngân hàng trên) · ${bs.reduce((s,b)=>s+b.mcq.length,0)} câu Luyện tập · ${bs.reduce((s,b)=>s+b.tf.length,0)} câu Đúng/Sai · ${bs.reduce((s,b)=>s+b.the.length,0)} thẻ nhớ`)(DATA["11"].bai)}</div>`;
+  if(!GV_SOLOP)GV_SOLOP=lopGV()[0]||"";
+  const lopDang={td:TD_LOP,ptl:PT_LOP,mg:PT_LOP,gviec:PT_LOP,tru:PT_LOP,so:GV_SOLOP,dh:PT_LOP}[GVTAB],ml=lopDang?mauLop(lopDang):null;
   return `<div class="top noprint"><button class="back" id="gvout">←</button><h1>Trang giáo viên</h1></div>
-  <div class="ltabs gvtabs noprint">${tabs.map(t=>`<button data-gt="${t[0]}" class="${GVTAB===t[0]?"on":""}">${t[1]}</button>`).join("")}</div><div class="wrap">${b}</div>`;
+  <div class="ltabs gvtabs noprint">${tabs.map(t=>`<button data-gt="${t[0]}" class="${GVTAB===t[0]?"on":""}">${t[1]}</button>`).join("")}</div><div class="wrap ${ml?"colop":""}" style="${ml?`--ml:${ml[0]};--mlnhat:${ml[1]}`:""}">${ml?`<div class="lopbar">🏫 Đang xem lớp <b>${esc(lopDang)}</b> · ${LOP_CO[lopDang]||"?"} học sinh</div>`:""}${b}</div>`;
 }
 let GV_SOLOP="",GV_SODS=null,GV_SOTH="";
 function veSoLop(){
@@ -1105,9 +1111,9 @@ function pinSlips(){
   return h+`</div><div class="small muted" style="margin-top:8px">Cắt phiếu theo số thứ tự trong danh sách lớp, phát cho từng em. Mã HS = Lớp-STT (VD ${esc(lop)}-05).</div></div>`;
 }
 function moTable(){
-  let h=`<div class="card small muted">Đọc mã cho lớp khi đã học xong trên lớp — học sinh nhập ở mục <b>Tài khoản → Nhập mã mở khoá</b>. Mã mở chặng mở mọi bài trong chặng (thử thách chặng vẫn cần ★★ ở các bài).</div>`;
+  let h=`<div class="card small muted">Mọi bài đều khoá. Học tới bài nào, cô gửi <b>mã mở bài</b> đó (đọc trên lớp hoặc tab 📣 Giao việc); học sinh chạm vào bài khoá trên Lộ trình rồi nhập mã, mở luôn cả Cổng của bài. Mã chặng mở mọi bài trong chặng, mã tất cả mở cả khối.</div>`;
   ["11"].forEach(g=>{
-    h+=`<div class="card"><h3 style="margin:0 0 6px">Tin ${g}</h3><div class="small">Mở <b>tất cả</b> các chặng: <span class="pill">${maMoKhoi(g)}</span></div><table><tr><th>Chặng / bài</th><th>Mã mở bài</th><th>Mã Cổng</th></tr>`;
+    h+=`<div class="card"><h3 style="margin:0 0 6px">Tin ${g}</h3><div class="small">Mở <b>tất cả</b> các chặng: <span class="pill">${maMoKhoi(g)}</span></div><table><tr><th>Chặng / bài</th><th>Mã mở bài (mở cả Cổng)</th><th>Mã chỉ mở Cổng</th></tr>`;
     chuongs(g).forEach((c,i)=>{h+=`<tr><td><b>Chặng ${i+1}. ${esc(c.ten)}</b></td><td><span class="pill">${maMoChuong(g,c.cd)}</span></td><td></td></tr>`;
       c.bai.forEach(b=>{h+=`<tr><td style="padding-left:14px">Bài ${b.so}. ${esc(b.ten)}</td><td><span class="pill">${maMoBai(g,b.so)}</span></td><td><span class="pill">${maCong(b.so)}</span></td></tr>`})});
     h+=`</table></div>`});
@@ -1455,7 +1461,7 @@ function guiSKCho(){
 function tabCong(b){
   const c=cg(b.so);
   if(!U.xem&&!c.moC)return `<div class="card"><h3 style="margin:0">🚪 Cổng ${NGUONG}/10 · Bài ${b.so}</h3><div class="small muted" style="margin-top:4px">Cô đọc mã mở Cổng trên lớp hoặc gửi trong tin nhắn giao việc. Em nhập một lần, sau đó luyện lại bao nhiêu lượt cũng được.</div>
-   <input id="cgma" type="tel" inputmode="numeric" maxlength="4" placeholder="Mã Cổng 4 số" style="margin-top:8px"><div id="cgmsg"></div><button class="btn" id="cgmo">Mở Cổng</button></div>`;
+   <input id="cgma" type="text" maxlength="6" autocapitalize="characters" placeholder="Mã cô gửi" style="margin-top:8px"><div id="cgmsg"></div><button class="btn" id="cgmo">Mở Cổng</button></div>`;
   return `<div class="card"><h3 style="margin:0">🚪 Cổng ${NGUONG}/10 · Bài ${b.so}</h3>
    <div class="small muted" style="margin-top:4px">10 câu lấy từ ngân hàng ${b.td.length} câu của bài: ${CO_CONG.NB} Biết · ${CO_CONG.TH} Hiểu · ${CO_CONG.VD} Vận dụng · ${CO_CONG.VDC} Vận dụng cao. Mỗi lượt là một đề mới. Đạt từ ${NGUONG}/10 và viết phản tư thì được đóng tem hộ chiếu (+${XP_C.tem} ⭐).</div>
    ${c.luot?`<div class="small" style="margin-top:8px">Cao nhất: <b>${so(c.cao)}/10</b> · lượt đầu ${so(c.dau)}/10 · ${c.luot} lượt</div><div style="margin-top:6px">${c.lich.map(l=>`<span class="pill">${so(l)}</span>`).join(" ")}</div>`:""}
@@ -1464,7 +1470,7 @@ function tabCong(b){
    ${c.cao>=NGUONG&&!c.pt?`<button class="btn gold" data-lt="pt">🪞 Viết phản tư để nhận tem</button>`:""}</div>`;
 }
 function ganCong(b){
-  const m=$("#cgmo");if(m)m.onclick=()=>{if($("#cgma").value.trim()===maCong(b.so)){cg(b.so).moC=1;save();render()}else $("#cgmsg").innerHTML=`<div class="err">Mã chưa đúng. Em hỏi cô nhé.</div>`};
+  const m=$("#cgmo");if(m)m.onclick=()=>{const v=$("#cgma").value.trim().toUpperCase();if(v===maCong(b.so)||v===maMoBai(U.g,b.so)){cg(b.so).moC=1;save();render()}else $("#cgmsg").innerHTML=`<div class="err">Mã chưa đúng. Em hỏi cô nhé.</div>`};
   const s=$("#cgbat");if(s)s.onclick=()=>startCong(b.so);
 }
 function startCong(so){
@@ -1700,13 +1706,13 @@ function bindManhGhep(){
 function viewGiaoViec(){
   PT_LOP=PT_LOP||lopGV()[0]||"";
   return `<div class="card">${chonLopBai("gvlop","gvbai",PT_LOP,PT_BAI)}<label for="gvhan">Hạn hoàn thành</label><input id="gvhan" type="text" placeholder="VD: 20 giờ thứ Năm 12/11"><button class="btn" id="gvtao">📣 Tạo tin nhắn giao việc</button></div>
-   ${GV_TIN?`<div class="card"><div class="code" style="white-space:pre-wrap;word-break:break-word">${esc(GV_TIN)}</div><button class="btn" id="gvchep">📋 Sao chép gửi nhóm lớp</button><div class="small muted" style="margin-top:6px">Tin nhắn có mã mở Cổng của bài, không có PIN cá nhân của học sinh.</div></div>`:""}`;
+   ${GV_TIN?`<div class="card"><div class="code" style="white-space:pre-wrap;word-break:break-word">${esc(GV_TIN)}</div><button class="btn" id="gvchep">📋 Sao chép gửi nhóm lớp</button><div class="small muted" style="margin-top:6px">Tin nhắn có mã mở bài (mở luôn Cổng), không có PIN cá nhân của học sinh.</div></div>`:""}`;
 }
 function bindGiaoViec(){
   const l=$("#gvlop"),bb=$("#gvbai"),t=$("#gvtao");if(!t)return;
   l.onchange=()=>{PT_LOP=l.value};bb.onchange=()=>{PT_BAI=+bb.value};
   t.onclick=()=>{if(!PT_BAI)return toast("Cô chọn bài trước nhé");const b=baiOf("11",PT_BAI),h=$("#gvhan").value.trim();
-    GV_TIN=`Lớp ${PT_LOP} thân mến,\nCác em vào app Chinh phục Tin học 11: ${TRANG_APP}\nBài ${b.so}. ${b.ten} (SGK trang ${b.trang})\n1. Đọc Trọng tâm, ôn Sơ đồ, Luyện tập.\n2. Vượt Cổng ${NGUONG}/10 — mã mở Cổng: ${maCong(b.so)}\n3. Câu sai: bấm Hỏi AI đúng cách, rồi làm lượt mới.\n4. Viết Phản tư để nhận tem hộ chiếu.\n${h?"Hạn: "+h+"\n":""}Kết quả tự gửi về cô, các em nhìn thấy dòng "Cô đã nhận kết quả" là xong.`;render()};
+    GV_TIN=`Lớp ${PT_LOP} thân mến,\nCác em vào app Chinh phục Tin học 11: ${TRANG_APP}\nBài ${b.so}. ${b.ten} (SGK trang ${b.trang})\nMã mở bài: ${maMoBai("11",b.so)} (chạm vào bài trên Lộ trình rồi nhập mã)\n1. Đọc Trọng tâm, ôn Sơ đồ, Luyện tập.\n2. Vượt Cổng ${NGUONG}/10.\n3. Câu sai: bấm Hỏi AI đúng cách, rồi làm lượt mới.\n4. Viết Phản tư để nhận tem hộ chiếu.\n${h?"Hạn: "+h+"\n":""}Kết quả tự gửi về cô, các em nhìn thấy dòng "Cô đã nhận kết quả" là xong.`;render()};
   const c=$("#gvchep");if(c)c.onclick=()=>{(navigator.clipboard?navigator.clipboard.writeText(GV_TIN):Promise.reject()).then(()=>toast("Đã chép ✓"),()=>toast("Máy chưa cho sao chép"))};
 }
 
@@ -2019,6 +2025,10 @@ function baoBanMoi(b){
 hoiBanMoi().then(b=>{if(b)moiBan(b)});
 setInterval(()=>hoiBanMoi().then(b=>{if(b)baoBanMoi(b)}),120000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)hoiBanMoi().then(b=>{if(b)baoBanMoi(b)})});
+
+/* ══════════ MỖI LỚP MỘT MÀU: thứ tự theo tên lớp, trùng màu tô dòng trên Google Sheet ══════════ */
+const MAU_LOP=[["#1d4ed8","#dbeafe"],["#c2410c","#ffedd5"],["#15803d","#dcfce7"],["#6d28d9","#ede9fe"],["#be185d","#fce7f3"],["#a16207","#fef9c3"]];
+function mauLop(lop){const ds=Object.keys(LOP_CO).sort();let i=ds.indexOf(lop);if(i<0)i=ds.length;return MAU_LOP[i%MAU_LOP.length]}
 
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */
