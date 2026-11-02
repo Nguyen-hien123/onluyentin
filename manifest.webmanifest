@@ -1,13 +1,13 @@
 {
- "name": "Cổng sẵn sàng · Tin học 10",
- "short_name": "Cổng sẵn sàng",
+ "name": "Chinh phục Tin học 11",
+ "short_name": "Chinh phục",
  "lang": "vi",
  "start_url": "./",
  "scope": "./",
  "display": "standalone",
  "orientation": "portrait",
- "background_color": "#f1f7f6",
- "theme_color": "#0f766e",
+ "background_color": "#1e1b4b",
+ "theme_color": "#1e1b4b",
  "icons": [
   {
    "src": "icon-192.png",
