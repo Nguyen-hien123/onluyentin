@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261111-2238"</script>
+<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261111-2259"</script>
 <script>
 /* Hộp thoại dự phòng: app nằm trong khung nhúng (Google Sites…) thì trình duyệt chặn confirm/alert/prompt (trả lời ngay "không").
    Phát hiện bị chặn (trả lời trong < 30 ms, người thật không bấm kịp) → hiện hộp hỏi ngay trên trang; bấm Đồng ý thì app bấm lại đúng nút vừa bấm. */
@@ -2657,10 +2657,9 @@ function vangHom(lop,ngay){const x=DD[lop+"|"+(ngay||ngayVN())];return x?[...x.v
 let BUOI={ngay:"",tu:"07:00",den:"17:30",d:null,lop:"",bai:0,tl:0,dd:null,doi:0,ddLuc:""};
 const buoiHien=()=>!!(BUOI.d&&BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI&&!BUOI.tl);
 function theBuoiChon(){
-  const ng=BUOI.ngay||ngayVN();
-  return `<div class="card noprint" style="border:2px solid #0d9488;margin-top:10px"><b>📅 Buổi học của Bài ${TD_BAI}</b><div class="small muted" style="margin:4px 0">Chỉ lấy những gì các em làm trong khung giờ của buổi này: em không đăng nhập, không làm bài trong buổi thì ô để trống, không hiện kết quả buổi trước.</div>
-   <div class="row"><div><label for="bngay" style="margin-top:0">Ngày</label><input id="bngay" type="date" value="${ng}"></div><div><label for="btu" style="margin-top:0">Từ giờ</label><input id="btu" type="time" value="${BUOI.tu}"></div><div><label for="bden" style="margin-top:0">Đến giờ</label><input id="bden" type="time" value="${BUOI.den}"></div></div>
-   <button class="btn" id="blay">📅 Lấy kết quả buổi này + điểm danh</button>${buoiHien()?`<button class="btn ghost" id="btl">📊 Xem tích luỹ mọi buổi</button>`:BUOI.d&&BUOI.tl&&BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI?`<button class="btn ghost" id="bve">📅 Quay lại buổi ${esc(BUOI.ngay)}</button>`:""}<div id="bmsg"></div></div>`;
+  const cua=BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI&&BUOI.d,kh=cua?(BUOI.coGiao?`Tính từ lúc cô giao <b>${gioNgan(BUOI.tuMs)}</b> đến ${BUOI.hanMs&&BUOI.hanMs<=BUOI.denMs?`hạn <b>${gioNgan(BUOI.hanMs)}</b>`:`<b>bây giờ</b>${BUOI.hanMs?` (hạn ${gioNgan(BUOI.hanMs)})`:""}`}: làm ở lớp hay ở nhà trong khoảng này đều được tính.`:`⚠️ Bài ${TD_BAI} chưa giao qua <b>📲 Gửi giao việc vào app</b> (tab 📣 Giao việc) nên đang tính mọi lúc. Giao qua app thì lần sau app tự tính từ lúc giao đến hạn.`):"📡 Đang lấy kết quả của lần giao bài này…";
+  return `<div class="card noprint" style="border:2px solid #0d9488;margin-top:10px"><b>📅 Lần giao Bài ${TD_BAI} · lớp ${esc(TD_LOP)}</b><div class="small" style="margin:4px 0">${kh}</div><div class="small muted">Em không làm bài trong khoảng này thì ô để trống, không hiện kết quả của lần trước.</div>
+   <button class="btn ghost" id="blay">🔄 Cập nhật</button>${buoiHien()?`<button class="btn ghost" id="btl">📊 Xem tích luỹ mọi buổi</button>`:BUOI.d&&BUOI.tl&&BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI?`<button class="btn ghost" id="bve">📅 Quay lại buổi ${esc(BUOI.ngay)}</button>`:""}<div id="bmsg"></div></div>`;
 }
 function ddCua(i){const x=BUOI.dd||{vang:[],phep:[]};return x.vang.includes(i)?"vang":x.phep.includes(i)?"phep":"co"}
 function veBuoi(){
@@ -2672,7 +2671,7 @@ function veBuoi(){
   const qb=(i,them)=>{const m=maLop(TD_LOP,i),k=dd(i);return `<button type="button" class="qb ${k!=="co"?"":tem(i)?"qua":(r(i)||{}).vao?"dang":"chua"}" data-dd="${i}" data-ma="${esc(m)}" style="${k==="vang"?"opacity:.45;border:3px dashed #7c3aed":k==="phep"?"opacity:.6;border:3px dashed #0891b2":""}"><span class="stt">${i}</span><span class="la" style="${/[♥♦]/.test(quanBai(m))?"color:#b91c1c":"color:#111827"}">${quanBai(m)}</span>${k==="vang"?'<span class="roi">🏠</span>':k==="phep"?'<span class="roi">📝</span>':them?`<span class="roi">${them}</span>`:""}</button>`};
   const nhom=(ten,a,giai,k)=>`<div class="card"><b>${ten}: ${a.length}</b><div class="small muted" style="margin:4px 0 8px">${giai}</div><div class="luoiqb">${a.map(i=>qb(i,k==="roi"?"👀"+r(i).roi+"·"+tgNgan(r(i).roiG||0):"")).join("")||'<span class="small muted">Không có em nào.</span>'}</div>${a.length&&!GVQL&&k!=="roi"?`<button class="btn" data-bnhac="${k}" style="padding:10px;font-size:15px">📣 Nhắc ${a.length} em trong app</button>`:""}</div>`;
   const o=v=>v?v:"";
-  return `<div class="card"><b>🧾 Điểm danh · lớp ${esc(TD_LOP)} · ngày ${esc(BUOI.ngay)}</b><div class="small muted" style="margin:4px 0 8px">Bấm vào quân bài để đổi: có mặt → 🏠 vắng → 📝 vắng có phép. Em vắng không tính vào “chưa đăng nhập”, không bị trừ điểm ở Thu bài, Trừ điểm. ${BUOI.ddLuc?"Đã lưu lúc "+esc(BUOI.ddLuc)+".":"Chưa lưu điểm danh buổi này."}</div>
+  return `<div class="card"><b>🧾 Điểm danh · lớp ${esc(TD_LOP)} · buổi ${esc(BUOI.ngay.split("-").reverse().join("/"))}</b><div class="small muted" style="margin:4px 0 8px">Bấm vào quân bài để đổi: có mặt → 🏠 vắng → 📝 vắng có phép. Em vắng không tính vào “chưa đăng nhập”, không bị trừ điểm ở Thu bài, Trừ điểm. ${BUOI.ddLuc?"Đã lưu lúc "+esc(BUOI.ddLuc)+".":"Chưa lưu điểm danh buổi này."}</div>
     <div class="grid2"><div class="tile"><div class="v">${coMat.length}</div><div class="l">✅ Có mặt</div></div><div class="tile"><div class="v">${nVang} · ${nPhep}</div><div class="l">🏠 Vắng · 📝 có phép</div></div></div>
     <div class="luoiqb" style="margin-top:8px">${ds.map(i=>qb(i)).join("")}</div>
     ${GVQL?"":`<button class="btn" id="bluudd">💾 Lưu điểm danh${BUOI.doi?" (có thay đổi)":""}</button><button class="btn ghost" id="bgoiy">✨ Gợi ý: em không đăng nhập buổi này là vắng</button>`}</div>
@@ -2681,23 +2680,26 @@ function veBuoi(){
    ${nhom("👀 Rời tab khi làm bài trong buổi",roi,"Số lần · tổng thời gian, xếp lâu nhất trước. App không biết em chuyển sang đâu, cô hỏi em trước khi kết luận.","roi")}
    <div class="card bang-td"><b>Kết quả Bài ${TD_BAI} trong buổi</b><table><tr><th>STT</th><th>Điểm danh</th><th>Vào</th><th>Cổng: lượt · đầu → cao</th><th>🪞</th><th>🛂</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>🤖</th><th>👀</th>${coBat("th")?"<th>🖼️</th>":""}</tr>
    ${ds.map(i=>{const x=r(i),k=dd(i);return `<tr style="${k!=="co"?"opacity:.55":""}"><td data-ma="${esc(maLop(TD_LOP,i))}"><b>${i}</b> <span class="small muted">${quanBai(maLop(TD_LOP,i))}</span></td><td>${k==="vang"?"🏠 Vắng":k==="phep"?"📝 Có phép":"✅"}</td><td>${x&&x.vao?"✓":""}</td><td>${x&&x.luot?x.luot+" · "+x.dau+" → "+x.cao:""}</td><td>${x&&x.pt?"✓":""}</td><td>${tem(i)?"🛂":""}</td><td>${x&&x.db>=0?x.db+"/12":""}</td><td>${o(x&&x.san)}</td><td>${o(x&&x.nhan)}</td><td>${o(x&&x.ai)}</td><td>${x&&x.roi?x.roi+"·"+tgNgan(x.roiG||0):""}</td>${coBat("th")?`<td>${x&&x.th?"✓":""}</td>`:""}</tr>`}).join("")}</table>
-   <div class="small muted" style="margin-top:6px">Chỉ tính hoạt động từ ${esc(BUOI.tu)} đến ${esc(BUOI.den)} ngày ${esc(BUOI.ngay)}. 🛂 = trong buổi đạt Cổng từ ${NGUONG}/10 và viết phản tư · 🌸 số câu đúng gói đặc biệt cao nhất · ô trống là em chưa làm phần đó trong buổi.</div></div>`;
+   <div class="small muted" style="margin-top:6px">Chỉ tính hoạt động từ ${esc(BUOI.tu)} đến ${esc(BUOI.den)}. 🛂 = trong buổi đạt Cổng từ ${NGUONG}/10 và viết phản tư · 🌸 số câu đúng gói đặc biệt cao nhất · ô trống là em chưa làm phần đó trong buổi.</div></div>`;
 }
+let BUOI_DANG="";
 function layBuoi(){
-  const ng=$("#bngay").value||ngayVN(),tu=$("#btu").value||"00:00",den=$("#bden").value||"23:59";
-  BUOI.ngay=ng;BUOI.tu=tu;BUOI.den=den;
-  const ms=g=>Date.parse(ng+"T"+g+":00+07:00"),a=ms(tu),b=ms(den)+59999;
-  if(!(b>a))return $("#bmsg").innerHTML='<div class="err">Giờ kết thúc phải sau giờ bắt đầu.</div>';
-  const t=$("#blay");t.disabled=true;t.textContent="⏳ Đang lấy…";
-  fetch(SHEET+"?a=buoi&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(TD_LOP)+"&bai="+TD_BAI+"&tu="+a+"&den="+b+"&ngay="+ng).then(r=>r.json()).then(d=>{
-    if(!d.ok)throw new Error(d.loi||"Chưa lấy được");if(!d.hs)throw new Error("Cô dán Apps Script bản mới (Phiên bản mới) rồi bấm lại");
-    BUOI.d=d.hs;BUOI.lop=TD_LOP;BUOI.bai=TD_BAI;BUOI.tl=0;BUOI.doi=0;
+  if(!coSheet()||!TD_BAI||!TD_LOP)return;const lop=TD_LOP,bai=TD_BAI,khoa=lop+"|"+bai;BUOI_DANG=khoa;
+  const t=$("#blay");if(t){t.disabled=true;t.textContent="⏳ Đang lấy…"}
+  fetch(SHEET+"?a=buoi&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(lop)+"&bai="+bai).then(r=>r.json()).then(d=>{
+    if(BUOI_DANG!==khoa)return;BUOI_DANG="";
+    if(!d.ok)throw new Error(d.loi||"Chưa lấy được");if(!d.hs||!("tu" in d))throw new Error("Cô dán Apps Script bản mới (Phiên bản mới) rồi bấm Cập nhật");
+    const ng=d.ngay||ngayVN();BUOI.ngay=ng;BUOI.tuMs=d.tu;BUOI.denMs=d.den;BUOI.hanMs=d.han;BUOI.coGiao=d.coGiao;
+    BUOI.tu=d.tu?new Date(d.tu).toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit",hour12:false})+" "+new Date(d.tu).toLocaleDateString("vi-VN"):"đầu năm";BUOI.den=new Date(d.den).toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit",hour12:false})+" "+new Date(d.den).toLocaleDateString("vi-VN");
+    if(TD_LOP!==lop||TD_BAI!==bai)return;
+    BUOI.d=d.hs;BUOI.lop=lop;BUOI.bai=bai;BUOI.tl=0;BUOI.doi=0;
     const k=TD_LOP+"|"+ng;BUOI.dd=d.dd?{vang:d.dd.vang,phep:d.dd.phep}:(DD[k]?{vang:DD[k].vang.slice(),phep:DD[k].phep.slice()}:{vang:[],phep:[]});BUOI.ddLuc=d.dd?d.dd.luc:"";
     if(d.dd){DD[k]={vang:d.dd.vang,phep:d.dd.phep};ghiDD()}render()})
-   .catch(e=>{t.disabled=false;t.textContent="📅 Lấy kết quả buổi này + điểm danh";$("#bmsg").innerHTML=`<div class="err">${esc(e.message)}</div>`});
+   .catch(e=>{BUOI_DANG="";const b=$("#blay");if(b){b.disabled=false;b.textContent="🔄 Cập nhật"}const m=$("#bmsg");if(m)m.innerHTML=`<div class="err">${esc(e.message)}</div>`});
 }
 function bindBuoi(){
   const t=$("#blay");if(!t)return;t.onclick=layBuoi;
+  if(!(BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI&&BUOI.d)&&BUOI_DANG!==TD_LOP+"|"+TD_BAI)layBuoi();   // chọn lớp, bài xong là tự lấy
   const tl=$("#btl");if(tl)tl.onclick=()=>{BUOI.tl=1;render()};const ve=$("#bve");if(ve)ve.onclick=()=>{BUOI.tl=0;render()};
   if(!buoiHien())return;
   document.querySelectorAll("[data-dd]").forEach(x=>x.onclick=()=>{if(GVQL)return;const i=+x.dataset.dd,d=BUOI.dd,k=ddCua(i);
