@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261111-1611"</script>
+<script>window.PWA = 1;</script><script>window.BAN_APP="olt-20261111-2238"</script>
 <script>
 /* Hộp thoại dự phòng: app nằm trong khung nhúng (Google Sites…) thì trình duyệt chặn confirm/alert/prompt (trả lời ngay "không").
    Phát hiện bị chặn (trả lời trong < 30 ms, người thật không bấm kịp) → hiện hộp hỏi ngay trên trang; bấm Đồng ý thì app bấm lại đúng nút vừa bấm. */
@@ -1440,6 +1440,8 @@ function viewTheoDoi(){
   let h=`<div class="card noprint"><div class="row"><div><label for="tdlop" style="margin-top:0">Lớp</label><select id="tdlop">${ls.map(l=>`<option ${l===TD_LOP?"selected":""}>${esc(l)}</option>`).join("")}</select></div>
    <div style="flex:3;min-width:0"><label for="tdbai" style="margin-top:0">Bài (để trống: tính mọi bài)</label><select id="tdbai" style="width:100%"><option value="">— Mọi bài —</option>${DATA["11"].bai.map(b=>`<option value="${b.so}" ${b.so===TD_BAI?"selected":""}>Bài ${b.so}. ${esc(b.ten)}</option>`).join("")}</select></div></div>
    <button class="btn" id="tdtai">🔄 Lấy dữ liệu mới từ Google Sheet</button><div class="small muted" style="margin-top:6px">${TD_LUC?"Cập nhật lúc "+TD_LUC+". ":"Chưa lấy dữ liệu. "}Số liệu theo lần app học sinh gửi gần nhất.</div><div id="tdmsg"></div></div>`;
+  if(TD_BAI)h+=theBuoiChon();
+  if(buoiHien())return h+veBuoi();   // đã lấy kết quả buổi học: chỉ hiện số liệu của buổi đó, không lẫn kết quả buổi trước
   if(!TD_DS)return h;
   const si=LOP_CO[TD_LOP]||0,map={};TD_DS.forEach(r=>{if(r.ma.split("-")[0]===TD_LOP)map[+r.ma.split("-")[1]]=r});
   const rows=[];for(let i=1;i<=si;i++)rows.push([i,map[i]]);
@@ -1468,6 +1470,7 @@ function layTheoDoi(){
       const c={};x.cong.forEach(o=>c[o.ma]=o);d.ds.forEach(r=>{const o=c[r.ma];r.caoB=o?o.cao:0;r.roiB=o?o.roi:0});return d.ds})});
 }
 function bindTheoDoi(){
+  bindBuoi();
   const s=$("#tdlop");if(s)s.onchange=()=>{TD_LOP=s.value;TD_LOC="";render()};
   const bb=$("#tdbai");if(bb)bb.onchange=()=>{TD_BAI=+bb.value||0;TD_DS=null;TD_LUC="";render()};
   document.querySelectorAll("[data-loc]").forEach(x=>x.onclick=()=>{TD_LOC=TD_LOC===x.dataset.loc?"":x.dataset.loc;render()});
@@ -1727,7 +1730,7 @@ function chiaToSTT(ds){const n=ds.length,to=[];let i=0;for(let k=0;k<4;k++){cons
 function viewManhGhep(){
   PT_LOP=PT_LOP||lopGV()[0]||"";
   return `<div class="card noprint">${chonLopBai("mglop","mgbai",PT_LOP,PT_BAI)}
-   <div class="row"><div><label for="mgso">Số nhóm mảnh ghép</label><input id="mgso" type="tel" value="${Math.max(2,Math.floor((LOP_CO[PT_LOP]||40)/4/2))}"></div><div><label for="mgvang">STT vắng (cách nhau dấu phẩy)</label><input id="mgvang" type="text" placeholder="VD: 3, 17"></div></div>
+   <div class="row"><div><label for="mgso">Số nhóm mảnh ghép</label><input id="mgso" type="tel" value="${Math.max(2,Math.floor((LOP_CO[PT_LOP]||40)/4/2))}"></div><div><label for="mgvang">STT vắng (cách nhau dấu phẩy)</label><input id="mgvang" type="text" value="${esc(vangHom(PT_LOP).join(", "))}" placeholder="VD: 3, 17"></div></div>
    <button class="btn" id="mgchia">👥 Chia tổ, nhóm, bể cá</button><div id="mgmsg"></div><div class="small muted" style="margin-top:6px">Chọn bài và có mạng thì app lấy kết quả Cổng từ Sheet để gắn ★ cho em đã sẵn sàng; chưa chọn bài thì chia theo số thứ tự. Chỉ hiện STT và quân bài, không có họ tên.</div></div><div id="mgkq">${MG_KQ}</div>
    <div class="card small"><b>🐟 Quy trình bể cá</b><ol style="margin:6px 0 0;padding-left:20px"><li>Vào bể (2'): 6 bạn vòng trong, các bạn còn lại vòng ngoài cầm phiếu.</li><li>Mở bể (1'): đọc câu hỏi lấy từ câu lớp sai nhiều nhất, nêu ý đầu tiên.</li><li>Thảo luận (6–7'): cầm "micro" mới nói, mỗi lượt không quá 1 phút, mỗi ý kèm dẫn chứng SGK.</li><li>Vòng ngoài ghi ý hay, đánh dấu ✓ ✗ ?, chuẩn bị câu hỏi.</li><li>"Thả câu" (3–4'): 3 bạn đọc câu hỏi, gọi số cá trả lời.</li><li>Bình chọn và tổng kết (3'): cô chốt kiến thức đúng và chỗ hay nhầm.</li></ol>Luật vàng: phản biện ý, không phản biện người.</div>
    <button class="btn ghost noprint" onclick="print()">🖨️ In</button>`;
@@ -1791,7 +1794,7 @@ function viewTruDiem(){
    <div class="row"><div><label for="trulop">Lớp</label><select id="trulop">${lopGV().map(l=>`<option ${l===PT_LOP?"selected":""}>${esc(l)}</option>`).join("")}</select></div><div><label for="truloai">Đối tượng</label><select id="truloai">${[["hs","Cá nhân"],["to","Cả tổ"],["mg","Nhóm mảnh ghép"],["be","Nhóm bể cá"]].map(o=>`<option value="${o[0]}" ${o[0]===TRU_LOAI?"selected":""}>${o[1]}</option>`).join("")}</select></div></div>
    ${ds.length?`<label for="truai">Chọn</label><select id="truai">${ds.map(d=>`<option value="${d[0]}">${esc(d[1])}</option>`).join("")}</select>`:`<div class="err">Chưa chia nhóm: cô vào tab 🧩 Mảnh ghép, bể cá bấm Chia trước.</div>`}
    <label for="truly">Lí do</label><input id="truly" list="trulyds" value="${esc(LY_TRU[0])}"><datalist id="trulyds">${LY_TRU.map(x=>`<option value="${esc(x)}">`).join("")}</datalist>
-   <label for="truvang">STT vắng hôm nay</label><input id="truvang" value="${esc(MG_VANG.join(", "))}" placeholder="VD: 3, 17">
+   <label for="truvang">STT vắng hôm nay</label><input id="truvang" value="${esc([...new Set([...MG_VANG,...vangHom(PT_LOP)])].sort((a,b)=>a-b).join(", "))}" placeholder="VD: 3, 17">
    <button class="btn" id="trugo" style="background:#b91c1c;color:#fff" ${ds.length?"":"disabled"}>−${XP_TRU} ⭐</button><div id="trumsg">${TRU_MSG}</div></div>
    <div class="card"><div class="row" style="align-items:center"><b style="flex:2">📒 Sổ trừ điểm · ${esc(PT_LOP)}</b><button class="btn ghost" id="trutai" style="margin:0;flex:1;padding:8px;font-size:14px">🔄 Lấy sổ</button></div>
    ${TRU_SO?(TRU_SO.length?TRU_SO.map(t=>`<div class="small" style="margin-top:8px;${t.hoan?"opacity:.55":""}"><b>${esc(t.luc)} · ${esc(t.ai)}</b> (${t.ds.length} em) · ${esc(t.ly)}${t.hoan?" · ↩️ đã hoàn":` <button class="chip" data-hoan="${esc(t.id)}">↩️ Hoàn điểm</button>`}</div>`).join(""):'<div class="small muted">Chưa có lần trừ nào.</div>'):""}</div>`;
@@ -2508,7 +2511,7 @@ const ANH_NHO={};   // ảnh nhỏ chỉ giữ khi trang đang mở
 function viewThuBai(){
   const l=PT_LOP||lopGV()[0]||"";PT_LOP=l;
   return `<div class="card noprint"><b>⏰ Đặt giờ thu bài</b>${chonLopBai("thlop","thbai",PT_LOP,PT_BAI)}
-   <div class="row"><div><label for="thgio">Giờ thu</label><input id="thgio" type="time"></div><div style="flex:2"><label for="thvang">STT vắng (cách nhau dấu phẩy)</label><input id="thvang" type="text" placeholder="VD: 3, 17"></div></div>
+   <div class="row"><div><label for="thgio">Giờ thu</label><input id="thgio" type="time"></div><div style="flex:2"><label for="thvang">STT vắng (cách nhau dấu phẩy)</label><input id="thvang" type="text" value="${esc(vangHom(PT_LOP).join(", "))}" placeholder="VD: 3, 17"></div></div>
    <div class="row"><button class="btn" id="thdat">⏰ Đặt giờ</button><button class="btn ghost" id="thngay">📥 Thu ngay</button></div>
    <div class="small muted" style="margin-top:6px">Đến giờ, app thống kê những gì các em làm <b>trước giờ thu</b>. Các em vẫn mở được app, phần làm sau giờ không được tính. Chỉ có mã Lớp-STT.</div></div><div id="thuDS"></div>`;
 }
@@ -2644,6 +2647,70 @@ function veGQ(b,e){
    ${GQ_BUOC.map((x,i)=>`<div class="card" style="border-left:6px solid ${x[2]}"><b style="color:${x[2]}">${x[0]}</b> <span class="small muted">· ${x[1]}</span><ul style="margin:6px 0 0;padding-left:20px">${g["b"+(i+1)].map(t=>`<li>${esc(t)}</li>`).join("")}</ul>${i===2?`<details style="margin-top:6px"><summary>👥 4 nhiệm vụ của 4 tổ và gợi ý đáp án</summary><div style="margin-top:6px">${bonKT(e,"Tổ")}</div></details>`:""}</div>`).join("")}`;
 }
 function inGQ(e,loai){const g=e.gq;return `<h2>Vấn đề cần giải quyết</h2><p>${esc(g.vd)}</p><h2>Hoạt động theo SGV</h2><ol>${g.hd.map(x=>`<li>${esc(x)}</li>`).join("")}</ol>${GQ_BUOC.map((x,i)=>`<h2>${x[0]} (${x[1]})</h2><ul>${g["b"+(i+1)].map(t=>`<li>${esc(t)}</li>`).join("")}</ul>`).join("")}<h2>4 tổ · 4 nhiệm vụ</h2>${e.bon.map((x,i)=>`<p><b>Tổ ${i+1}:</b> ${esc(x)}${loai==="da"?`<br><i>${esc(e.dap[i][0])}</i>`:""}</p>`).join("")}`}
+
+/* ───── 📅 BUỔI HỌC + ĐIỂM DANH (trong 📋 Theo dõi): chọn lớp, bài, ngày → chỉ số liệu của buổi đó; em vắng không bị tính, không bị trừ */
+let DD={};try{DD=JSON.parse(localStorage.getItem(KEY+"_dd")||"{}")}catch(e){}
+const ghiDD=()=>{try{localStorage.setItem(KEY+"_dd",JSON.stringify(DD))}catch(e){}};
+const ngayVN=t=>new Date((t||Date.now())+7*36e5).toISOString().slice(0,10);
+// STT vắng (cả có phép) của lớp trong ngày, dùng chung cho Thu bài, Trừ điểm, Mảnh ghép
+function vangHom(lop,ngay){const x=DD[lop+"|"+(ngay||ngayVN())];return x?[...x.vang,...x.phep].sort((a,b)=>a-b):[]}
+let BUOI={ngay:"",tu:"07:00",den:"17:30",d:null,lop:"",bai:0,tl:0,dd:null,doi:0,ddLuc:""};
+const buoiHien=()=>!!(BUOI.d&&BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI&&!BUOI.tl);
+function theBuoiChon(){
+  const ng=BUOI.ngay||ngayVN();
+  return `<div class="card noprint" style="border:2px solid #0d9488;margin-top:10px"><b>📅 Buổi học của Bài ${TD_BAI}</b><div class="small muted" style="margin:4px 0">Chỉ lấy những gì các em làm trong khung giờ của buổi này: em không đăng nhập, không làm bài trong buổi thì ô để trống, không hiện kết quả buổi trước.</div>
+   <div class="row"><div><label for="bngay" style="margin-top:0">Ngày</label><input id="bngay" type="date" value="${ng}"></div><div><label for="btu" style="margin-top:0">Từ giờ</label><input id="btu" type="time" value="${BUOI.tu}"></div><div><label for="bden" style="margin-top:0">Đến giờ</label><input id="bden" type="time" value="${BUOI.den}"></div></div>
+   <button class="btn" id="blay">📅 Lấy kết quả buổi này + điểm danh</button>${buoiHien()?`<button class="btn ghost" id="btl">📊 Xem tích luỹ mọi buổi</button>`:BUOI.d&&BUOI.tl&&BUOI.lop===TD_LOP&&BUOI.bai===TD_BAI?`<button class="btn ghost" id="bve">📅 Quay lại buổi ${esc(BUOI.ngay)}</button>`:""}<div id="bmsg"></div></div>`;
+}
+function ddCua(i){const x=BUOI.dd||{vang:[],phep:[]};return x.vang.includes(i)?"vang":x.phep.includes(i)?"phep":"co"}
+function veBuoi(){
+  const si=LOP_CO[TD_LOP]||0,hs=BUOI.d,ds=[];for(let i=1;i<=si;i++)ds.push(i);
+  Object.keys(hs).forEach(m=>{const i=+m.split("-")[1];if(i>si&&!ds.includes(i))ds.push(i)});
+  const r=i=>hs[maLop(TD_LOP,i)]||null,dd=ddCua,coMat=ds.filter(i=>dd(i)==="co");
+  const chuaVao=coMat.filter(i=>!(r(i)||{}).vao),chuaCong=coMat.filter(i=>(r(i)||{}).vao&&((r(i)||{}).cao||0)<NGUONG),roi=ds.filter(i=>((r(i)||{}).roi||0)>0).sort((a,b)=>(r(b).roiG||0)-(r(a).roiG||0));
+  const tem=i=>{const x=r(i);return !!(x&&x.cao>=NGUONG&&x.pt)},nVang=ds.filter(i=>dd(i)==="vang").length,nPhep=ds.filter(i=>dd(i)==="phep").length;
+  const qb=(i,them)=>{const m=maLop(TD_LOP,i),k=dd(i);return `<button type="button" class="qb ${k!=="co"?"":tem(i)?"qua":(r(i)||{}).vao?"dang":"chua"}" data-dd="${i}" data-ma="${esc(m)}" style="${k==="vang"?"opacity:.45;border:3px dashed #7c3aed":k==="phep"?"opacity:.6;border:3px dashed #0891b2":""}"><span class="stt">${i}</span><span class="la" style="${/[♥♦]/.test(quanBai(m))?"color:#b91c1c":"color:#111827"}">${quanBai(m)}</span>${k==="vang"?'<span class="roi">🏠</span>':k==="phep"?'<span class="roi">📝</span>':them?`<span class="roi">${them}</span>`:""}</button>`};
+  const nhom=(ten,a,giai,k)=>`<div class="card"><b>${ten}: ${a.length}</b><div class="small muted" style="margin:4px 0 8px">${giai}</div><div class="luoiqb">${a.map(i=>qb(i,k==="roi"?"👀"+r(i).roi+"·"+tgNgan(r(i).roiG||0):"")).join("")||'<span class="small muted">Không có em nào.</span>'}</div>${a.length&&!GVQL&&k!=="roi"?`<button class="btn" data-bnhac="${k}" style="padding:10px;font-size:15px">📣 Nhắc ${a.length} em trong app</button>`:""}</div>`;
+  const o=v=>v?v:"";
+  return `<div class="card"><b>🧾 Điểm danh · lớp ${esc(TD_LOP)} · ngày ${esc(BUOI.ngay)}</b><div class="small muted" style="margin:4px 0 8px">Bấm vào quân bài để đổi: có mặt → 🏠 vắng → 📝 vắng có phép. Em vắng không tính vào “chưa đăng nhập”, không bị trừ điểm ở Thu bài, Trừ điểm. ${BUOI.ddLuc?"Đã lưu lúc "+esc(BUOI.ddLuc)+".":"Chưa lưu điểm danh buổi này."}</div>
+    <div class="grid2"><div class="tile"><div class="v">${coMat.length}</div><div class="l">✅ Có mặt</div></div><div class="tile"><div class="v">${nVang} · ${nPhep}</div><div class="l">🏠 Vắng · 📝 có phép</div></div></div>
+    <div class="luoiqb" style="margin-top:8px">${ds.map(i=>qb(i)).join("")}</div>
+    ${GVQL?"":`<button class="btn" id="bluudd">💾 Lưu điểm danh${BUOI.doi?" (có thay đổi)":""}</button><button class="btn ghost" id="bgoiy">✨ Gợi ý: em không đăng nhập buổi này là vắng</button>`}</div>
+   ${nhom("🚫 Có mặt nhưng chưa đăng nhập buổi này",chuaVao,"Không tính em vắng. Có thể em quên mang máy hoặc dùng chung máy với bạn, cô hỏi lại.","vao")}
+   ${nhom(`🚪 Đã vào nhưng chưa vượt Cổng ${NGUONG}/10 Bài ${TD_BAI} trong buổi`,chuaCong,"Tính lượt làm trong buổi này.","cong")}
+   ${nhom("👀 Rời tab khi làm bài trong buổi",roi,"Số lần · tổng thời gian, xếp lâu nhất trước. App không biết em chuyển sang đâu, cô hỏi em trước khi kết luận.","roi")}
+   <div class="card bang-td"><b>Kết quả Bài ${TD_BAI} trong buổi</b><table><tr><th>STT</th><th>Điểm danh</th><th>Vào</th><th>Cổng: lượt · đầu → cao</th><th>🪞</th><th>🛂</th><th>🌸</th><th>⚔️</th><th>🤝</th><th>🤖</th><th>👀</th>${coBat("th")?"<th>🖼️</th>":""}</tr>
+   ${ds.map(i=>{const x=r(i),k=dd(i);return `<tr style="${k!=="co"?"opacity:.55":""}"><td data-ma="${esc(maLop(TD_LOP,i))}"><b>${i}</b> <span class="small muted">${quanBai(maLop(TD_LOP,i))}</span></td><td>${k==="vang"?"🏠 Vắng":k==="phep"?"📝 Có phép":"✅"}</td><td>${x&&x.vao?"✓":""}</td><td>${x&&x.luot?x.luot+" · "+x.dau+" → "+x.cao:""}</td><td>${x&&x.pt?"✓":""}</td><td>${tem(i)?"🛂":""}</td><td>${x&&x.db>=0?x.db+"/12":""}</td><td>${o(x&&x.san)}</td><td>${o(x&&x.nhan)}</td><td>${o(x&&x.ai)}</td><td>${x&&x.roi?x.roi+"·"+tgNgan(x.roiG||0):""}</td>${coBat("th")?`<td>${x&&x.th?"✓":""}</td>`:""}</tr>`}).join("")}</table>
+   <div class="small muted" style="margin-top:6px">Chỉ tính hoạt động từ ${esc(BUOI.tu)} đến ${esc(BUOI.den)} ngày ${esc(BUOI.ngay)}. 🛂 = trong buổi đạt Cổng từ ${NGUONG}/10 và viết phản tư · 🌸 số câu đúng gói đặc biệt cao nhất · ô trống là em chưa làm phần đó trong buổi.</div></div>`;
+}
+function layBuoi(){
+  const ng=$("#bngay").value||ngayVN(),tu=$("#btu").value||"00:00",den=$("#bden").value||"23:59";
+  BUOI.ngay=ng;BUOI.tu=tu;BUOI.den=den;
+  const ms=g=>Date.parse(ng+"T"+g+":00+07:00"),a=ms(tu),b=ms(den)+59999;
+  if(!(b>a))return $("#bmsg").innerHTML='<div class="err">Giờ kết thúc phải sau giờ bắt đầu.</div>';
+  const t=$("#blay");t.disabled=true;t.textContent="⏳ Đang lấy…";
+  fetch(SHEET+"?a=buoi&gv="+encodeURIComponent(GVPIN)+"&lop="+encodeURIComponent(TD_LOP)+"&bai="+TD_BAI+"&tu="+a+"&den="+b+"&ngay="+ng).then(r=>r.json()).then(d=>{
+    if(!d.ok)throw new Error(d.loi||"Chưa lấy được");if(!d.hs)throw new Error("Cô dán Apps Script bản mới (Phiên bản mới) rồi bấm lại");
+    BUOI.d=d.hs;BUOI.lop=TD_LOP;BUOI.bai=TD_BAI;BUOI.tl=0;BUOI.doi=0;
+    const k=TD_LOP+"|"+ng;BUOI.dd=d.dd?{vang:d.dd.vang,phep:d.dd.phep}:(DD[k]?{vang:DD[k].vang.slice(),phep:DD[k].phep.slice()}:{vang:[],phep:[]});BUOI.ddLuc=d.dd?d.dd.luc:"";
+    if(d.dd){DD[k]={vang:d.dd.vang,phep:d.dd.phep};ghiDD()}render()})
+   .catch(e=>{t.disabled=false;t.textContent="📅 Lấy kết quả buổi này + điểm danh";$("#bmsg").innerHTML=`<div class="err">${esc(e.message)}</div>`});
+}
+function bindBuoi(){
+  const t=$("#blay");if(!t)return;t.onclick=layBuoi;
+  const tl=$("#btl");if(tl)tl.onclick=()=>{BUOI.tl=1;render()};const ve=$("#bve");if(ve)ve.onclick=()=>{BUOI.tl=0;render()};
+  if(!buoiHien())return;
+  document.querySelectorAll("[data-dd]").forEach(x=>x.onclick=()=>{if(GVQL)return;const i=+x.dataset.dd,d=BUOI.dd,k=ddCua(i);
+    d.vang=d.vang.filter(z=>z!==i);d.phep=d.phep.filter(z=>z!==i);if(k==="co")d.vang.push(i);else if(k==="vang")d.phep.push(i);BUOI.doi=1;render()});
+  const g=$("#bgoiy");if(g)g.onclick=()=>{const si=LOP_CO[TD_LOP]||0,d=BUOI.dd;for(let i=1;i<=si;i++)if(!(BUOI.d[maLop(TD_LOP,i)]||{}).vao&&!d.phep.includes(i)&&!d.vang.includes(i))d.vang.push(i);BUOI.doi=1;render();toast("Cô xem lại, bấm quân bài để sửa em có mặt mà quên đăng nhập")};
+  const l=$("#bluudd");if(l)l.onclick=()=>{const d=BUOI.dd,k=TD_LOP+"|"+BUOI.ngay;DD[k]={vang:d.vang.slice(),phep:d.phep.slice()};ghiDD();
+    guiGV({diemdanh:{lop:TD_LOP,ngay:BUOI.ngay,vang:d.vang,phep:d.phep}}).then(()=>{BUOI.doi=0;BUOI.ddLuc=new Date().toLocaleString("vi-VN");render();toast("💾 Đã lưu điểm danh lên Google Sheet")},e=>{BUOI.doi=0;render();toast("Đã lưu trên máy này; "+(e.message||"chưa gửi được lên Sheet"))})};
+  document.querySelectorAll("[data-bnhac]").forEach(x=>x.onclick=()=>{const k=x.dataset.bnhac,si=LOP_CO[TD_LOP]||0,ds=[];
+    for(let i=1;i<=si;i++){const r=BUOI.d[maLop(TD_LOP,i)]||{};if(ddCua(i)!=="co")continue;if(k==="vao"?!r.vao:r.vao&&(r.cao||0)<NGUONG)ds.push(maLop(TD_LOP,i))}
+    const ly=k==="vao"?"Em nhớ vào app Chinh phục Tin học 11 làm bài của buổi học hôm nay nhé.":`Em nhớ vượt Cổng ${NGUONG}/10 Bài ${TD_BAI} nhé.`;
+    if(!confirm(`Gửi nhắc tới ${ds.length} em lớp ${TD_LOP}?\n"${ly}"\nKhông trừ điểm.`))return;
+    x.disabled=true;guiTru({id:"nhac"+Date.now(),kieu:"Nhắc",lop:TD_LOP,ai:"Nhắc",ly,ds}).then(()=>toast("Đã gửi lời nhắc ✓"),()=>{x.disabled=false;toast("Chưa gửi được, cô thử lại nhé")})});
+}
 
 
 /* ══════════ GIẤY CHỨNG NHẬN — bộ vẽ canvas (lấy từ app Cổng sẵn sàng) ══════════ */
